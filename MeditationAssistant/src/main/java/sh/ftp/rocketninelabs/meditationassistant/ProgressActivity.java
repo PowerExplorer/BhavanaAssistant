@@ -3,33 +3,35 @@ package net.gnu.meditationassistant;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.NavUtils;
-import android.support.v4.view.PagerTabStrip;
-import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TabHost;
 import android.widget.TextView;
+
+//import androidx.core.app.NavUtils;
+//import androidx.fragment.app.Fragment;
+//import androidx.fragment.app.FragmentActivity;
+//import androidx.fragment.app.FragmentManager;
+//import androidx.fragment.app.FragmentPagerAdapter;
+//import androidx.viewpager.widget.PagerTabStrip;
+//import androidx.viewpager.widget.ViewPager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.TimeZone;
+import android.support.v4.app.*;
+import android.support.v4.view.*;
+import android.view.*;
 
 public class ProgressActivity extends FragmentActivity {
-    public SparseArray<SessionSQL> sessions_map = new SparseArray<SessionSQL>();
+    public SparseArray<SessionSQL> sessions_map = new SparseArray<>();
     TabHost mTabHost;
     ViewPager mViewPager;
     ProgressPagerAdapter mPagerAdapter = null;
@@ -86,8 +88,6 @@ public class ProgressActivity extends FragmentActivity {
         } else {
             mViewPager.setCurrentItem(CALENDAR_FRAGMENT, false);
         }
-
-        getMeditationAssistant().utility.initializeTracker(this);
     }
 
     public void goToSessionAtDate(int[] date) {
@@ -119,17 +119,16 @@ public class ProgressActivity extends FragmentActivity {
 
                 ArrayList<SessionSQL> sessions = getMeditationAssistant().db.getSessionsByDate(c);
 
-                final ArrayAdapter<String> sessionsDialogAdapter = new ArrayAdapter<String>(
+                final ArrayAdapter<String> sessionsDialogAdapter = new ArrayAdapter<>(
                         this,
                         android.R.layout.select_dialog_item);
 
                 sessions_map.clear();
                 int session_index = 0;
-                for (Iterator<SessionSQL> i = sessions.iterator(); i.hasNext(); ) {
-                    SessionSQL session = i.next();
+                for (SessionSQL session : sessions) {
                     Calendar cal2 = Calendar.getInstance();
                     cal2.setTimeInMillis(session._completed * 1000);
-                    sessionsDialogAdapter.add(String.valueOf(session._length / 3600) + ":"
+                    sessionsDialogAdapter.add(session._length / 3600 + ":"
                             + String.format("%02d", (session._length % 3600) / 60)
                             + " - " + sdf2.format(cal2.getTime()));
 
@@ -138,13 +137,7 @@ public class ProgressActivity extends FragmentActivity {
                 }
 
                 sessionDetailsDialog = new AlertDialog.Builder(this)
-                        .setIcon(
-                                getResources().getDrawable(
-                                        getMeditationAssistant().getTheme().obtainStyledAttributes(getMeditationAssistant().getMATheme(true),
-                                                new int[]{R.attr.actionIconGoToToday})
-                                                .getResourceId(0, 0)
-                                )
-                        )
+                        .setIcon(getResources().getDrawable(getMeditationAssistant().getTheme().obtainStyledAttributes(getMeditationAssistant().getMATheme(true), new int[]{R.attr.actionIconGoToToday}).getResourceId(0, 0)))
                         .setTitle(sdf.format(sess_date))
                         .setAdapter(sessionsDialogAdapter,
                                 new DialogInterface.OnClickListener() {
@@ -180,7 +173,7 @@ public class ProgressActivity extends FragmentActivity {
                 Locale.getDefault());
         sdf2.setTimeZone(TimeZone.getDefault());
 
-        String session_title = String.valueOf(sessionsql._length / 3600) + ":"
+        String session_title = sessionsql._length / 3600 + ":"
                 + String.format("%02d", (sessionsql._length % 3600) / 60)
                 + " - " + sdf.format(sess_date);
 
@@ -189,10 +182,10 @@ public class ProgressActivity extends FragmentActivity {
 
         View detailsView = LayoutInflater.from(this).inflate(
                 R.layout.session_details,
-                (ViewGroup) findViewById(R.id.sessionDetails_root));
+			((ViewGroup) findViewById(R.id.sessionDetails_root)));
 
-        TextView txtSessionDetailsStarted = (TextView) detailsView.findViewById(R.id.txtSessionDetailsStarted);
-        TextView txtSessionDetailsMessage = (TextView) detailsView.findViewById(R.id.txtSessionDetailsMessage);
+        TextView txtSessionDetailsStarted = detailsView.findViewById(R.id.txtSessionDetailsStarted);
+        TextView txtSessionDetailsMessage = detailsView.findViewById(R.id.txtSessionDetailsMessage);
 
         txtSessionDetailsStarted.setText(String.format(getString(R.string.sessionStartedAt), session_started));
 
@@ -210,13 +203,7 @@ public class ProgressActivity extends FragmentActivity {
         }
 
         sessionDetailsDialog = new AlertDialog.Builder(this)
-                .setIcon(
-                        getResources().getDrawable(
-                                getMeditationAssistant().getTheme().obtainStyledAttributes(getMeditationAssistant().getMATheme(true),
-                                        new int[]{R.attr.actionIconGoToToday})
-                                        .getResourceId(0, 0)
-                        )
-                )
+                .setIcon(getResources().getDrawable(getMeditationAssistant().getTheme().obtainStyledAttributes(getMeditationAssistant().getMATheme(true), new int[]{R.attr.actionIconGoToToday}).getResourceId(0, 0)))
                 .setTitle(session_title)
                 .setView(detailsView)
                 .create();
@@ -242,18 +229,6 @@ public class ProgressActivity extends FragmentActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        getMeditationAssistant().utility.trackingStart(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        getMeditationAssistant().utility.trackingStop(this);
     }
 
     @Override

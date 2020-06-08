@@ -6,7 +6,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +13,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.support.v4.app.*;
+
+//import androidx.core.app.NavUtils;
 
 public class AboutActivity extends Activity {
 
@@ -62,8 +64,6 @@ public class AboutActivity extends Activity {
                 return true;
             }
         });
-
-        getMeditationAssistant().utility.initializeTracker(this);
     }
 
     @Override
@@ -90,12 +90,22 @@ public class AboutActivity extends Activity {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         } else if (i == R.id.action_share_app) {
-            try {
-                Intent intent = getMeditationAssistant().utility.getAppShareIntent();
-                startActivityForResult(intent, 1337);
-            } catch (Exception e) {
-                e.printStackTrace();
+            String shareURL;
+            if (BuildConfigBackup.FLAVOR.equals("opensource")) {
+                shareURL = "https://f-droid.org/packages/" + getApplicationContext().getPackageName();
+            } else if (getMeditationAssistant().getMarketName().equals("google")) {
+                shareURL = "http://play.google.com/store/apps/details?id=" + getApplicationContext().getPackageName();
+            } else if (getMeditationAssistant().getMarketName().equals("amazon")) {
+                shareURL = "http://www.amazon.com/gp/mas/dl/android?p=" + getApplicationContext().getPackageName();
+            } else {
+                return true;
             }
+
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, shareURL + " " + getString(R.string.invitationBlurb));
+            startActivity(Intent.createChooser(shareIntent, getString(R.string.share)));
+            return true;
         } else if (i == R.id.action_rate) {
             getMeditationAssistant().rateApp();
             return true;
@@ -104,24 +114,8 @@ public class AboutActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        getMeditationAssistant().utility.trackingStart(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        getMeditationAssistant().utility.trackingStop(this);
-    }
-
     public void learnMore(View view) {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MeditationAssistant.URL_SOURCE)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-    }
-
-    public void openHowToMeditate(View view) {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(MeditationAssistant.URL_MEDINET + "/howtomeditate")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     public void openTranslate(View view) {

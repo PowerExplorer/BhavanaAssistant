@@ -32,7 +32,7 @@
         <!--android:layoutDirection="ltr"-->
 
         <!-- hour -->
-        <sh.ftp.rocketninelabs.meditationassistant.NumberPicker
+        <net.gnu.meditationassistant.NumberPicker
             android:id="@+id/hour"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
             tools:ignore="UnusedAttribute"/>
 
         <!-- minute -->
-        <sh.ftp.rocketninelabs.meditationassistant.NumberPicker
+        <net.gnu.meditationassistant.NumberPicker
             android:id="@+id/minute"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
     </LinearLayout>
 
     <!-- AM / PM -->
-    <sh.ftp.rocketninelabs.meditationassistant.NumberPicker
+    <net.gnu.meditationassistant.NumberPicker
         android:id="@+id/amPm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

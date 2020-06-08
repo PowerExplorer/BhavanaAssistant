@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <string name="appName">Meditation Assistant Free</string>
-    <string name="appNameShort">Meditation Assistant</string>
+    <string name="appNameShort">Bhavana Assistant</string>
     <string name="about">על אודות</string>
     <string name="yes">כן</string>
     <string name="no">לא</string>

@@ -3,10 +3,11 @@ package net.gnu.meditationassistant;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.MainThread;
-import android.support.annotation.Nullable;
-import android.support.annotation.WorkerThread;
 import android.util.Log;
+
+//import androidx.annotation.MainThread;
+//import androidx.annotation.Nullable;
+//import androidx.annotation.WorkerThread;
 
 import net.openid.appauth.AppAuthConfiguration;
 import net.openid.appauth.AuthState;
@@ -23,6 +24,7 @@ import org.json.JSONObject;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
+import android.support.annotation.*;
 
 /**
  * Displays the authorized state of the user. This activity is provided with the outcome of the
@@ -156,7 +158,8 @@ public class AuthResultActivity extends Activity {
 				@Override
 				public void onTokenRequestCompleted(TokenResponse p1, AuthorizationException p2) {
 					AuthResultActivity.this.handleAccessTokenResponse(p1, p2);
-					}});
+			}
+				});
     }
 
     @MainThread
@@ -168,10 +171,7 @@ public class AuthResultActivity extends Activity {
 				@Override
 				public void onTokenRequestCompleted(TokenResponse p1, AuthorizationException p2) {
 					AuthResultActivity.this.handleCodeExchangeResponse(p1, p2);
-				}
-				
-				
-			});
+					}});
     }
 
     @MainThread
@@ -203,7 +203,7 @@ public class AuthResultActivity extends Activity {
 					public void run() {
 						AuthResultActivity.this.updateState();
 					}
-				});
+		});
     }
 
     @WorkerThread
@@ -216,9 +216,8 @@ public class AuthResultActivity extends Activity {
 					@Override
 					public void run() {
 						AuthResultActivity.this.updateState();
-					}
-		});
-    }
+    }});
+	}
 
     public MeditationAssistant getMeditationAssistant() {
         if (ma == null) {

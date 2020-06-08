@@ -11,14 +11,14 @@ public class SessionSQL {
     public Long _modified;
 
     public SessionSQL() {
-        this._id = (long) 0;
-        this._started = (long) 0;
-        this._completed = (long) 0;
-        this._length = (long) 0;
+        this._id = new Long(0);
+        this._started = new Long(0);
+        this._completed = new Long(0);
+        this._length = new Long(0);
         this._message = "";
-        this._isposted = (long) 0;
-        this._streakday = (long) 0;
-        this._modified = (long) 0;
+        this._isposted = new Long(0);
+        this._streakday = new Long(0);
+        this._modified = new Long(0);
     }
 
     public SessionSQL(Long id, Long started, Long completed, Long length, String message,

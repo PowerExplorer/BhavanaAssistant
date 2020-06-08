@@ -3,15 +3,17 @@ package net.gnu.meditationassistant;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+//import androidx.fragment.app.Fragment;
+
 import java.text.NumberFormat;
 import java.util.Locale;
+import android.support.v4.app.*;
 
 public class StatsFragment extends Fragment {
     private MeditationAssistant ma = null;
@@ -46,18 +48,18 @@ public class StatsFragment extends Fragment {
         int abovehours = abovedays % 3600;
         int time_spent_meditating_minutes = abovehours / 60;
 
-        TextView txtTimespentMeditatingDays = (TextView) fragment_progress_stats.findViewById(R.id.txtTimeSpentMeditatingDays);
-        TextView txtTimespentMeditatingHours = (TextView) fragment_progress_stats.findViewById(R.id.txtTimeSpentMeditatingHours);
-        TextView txtTimespentMeditatingMinutes = (TextView) fragment_progress_stats.findViewById(R.id.txtTimeSpentMeditatingMinutes);
+        TextView txtTimespentMeditatingDays = fragment_progress_stats.findViewById(R.id.txtTimeSpentMeditatingDays);
+        TextView txtTimespentMeditatingHours = fragment_progress_stats.findViewById(R.id.txtTimeSpentMeditatingHours);
+        TextView txtTimespentMeditatingMinutes = fragment_progress_stats.findViewById(R.id.txtTimeSpentMeditatingMinutes);
 
         txtTimespentMeditatingDays.setText(String.valueOf(time_spent_meditating_days));
         txtTimespentMeditatingHours.setText(String.valueOf(time_spent_meditating_hours));
         txtTimespentMeditatingMinutes.setText(String.valueOf(time_spent_meditating_minutes));
 
-        TextView txtOtherStatisticsSessions = (TextView) fragment_progress_stats.findViewById(R.id.txtOtherStatisticsSessions);
-        TextView txtOtherStatisticsLongestDuration = (TextView) fragment_progress_stats.findViewById(R.id.txtOtherStatisticsLongestDuration);
-        TextView txtOtherStatisticsAverageDuration = (TextView) fragment_progress_stats.findViewById(R.id.txtOtherStatisticsAverageDuration);
-        TextView txtOtherStatisticsLongestStreak = (TextView) fragment_progress_stats.findViewById(R.id.txtOtherStatisticsLongestStreak);
+        TextView txtOtherStatisticsSessions = fragment_progress_stats.findViewById(R.id.txtOtherStatisticsSessions);
+        TextView txtOtherStatisticsLongestDuration = fragment_progress_stats.findViewById(R.id.txtOtherStatisticsLongestDuration);
+        TextView txtOtherStatisticsAverageDuration = fragment_progress_stats.findViewById(R.id.txtOtherStatisticsAverageDuration);
+        TextView txtOtherStatisticsLongestStreak = fragment_progress_stats.findViewById(R.id.txtOtherStatisticsLongestStreak);
 
         int numSessions = getMeditationAssistant().db.getNumSessions();
         txtOtherStatisticsSessions.setText(NumberFormat.getNumberInstance(currentLocale).format(numSessions));
@@ -72,7 +74,7 @@ public class StatsFragment extends Fragment {
         int secondsPerSessionMinutes = secondsPerSessionRemainder / 60;
         int secondsPerSessionSeconds = secondsPerSessionRemainder % 60;
 
-        txtOtherStatisticsAverageDuration.setText(String.valueOf(secondsPerSessionHours) + ":" + String.format("%02d", secondsPerSessionMinutes) + ":" + String.format("%02d", secondsPerSessionSeconds));
+        txtOtherStatisticsAverageDuration.setText(secondsPerSessionHours + ":" + String.format("%02d", secondsPerSessionMinutes) + ":" + String.format("%02d", secondsPerSessionSeconds));
 
         // Re-use variables
         secondsPerSession = getMeditationAssistant().db.getLongestSessionLength();
@@ -81,13 +83,12 @@ public class StatsFragment extends Fragment {
         secondsPerSessionMinutes = secondsPerSessionRemainder / 60;
         secondsPerSessionSeconds = secondsPerSessionRemainder % 60;
 
-        txtOtherStatisticsLongestDuration.setText(String.valueOf(secondsPerSessionHours) + ":" + String.format("%02d", secondsPerSessionMinutes) + ":" + String.format("%02d", secondsPerSessionSeconds));
+        txtOtherStatisticsLongestDuration.setText(secondsPerSessionHours + ":" + String.format("%02d", secondsPerSessionMinutes) + ":" + String.format("%02d", secondsPerSessionSeconds));
 
         int longestStreak = getMeditationAssistant().getLongestMeditationStreak();
         txtOtherStatisticsLongestStreak.setText(String.format(getResources().getQuantityString(R.plurals.daysOfMeditationMinimal, longestStreak, longestStreak), NumberFormat.getNumberInstance(currentLocale).format(longestStreak)));
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,7 +124,6 @@ public class StatsFragment extends Fragment {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

@@ -217,15 +217,15 @@
                     android:layout_height="wrap_content"
                     android:gravity="top"
                     android:hint="@string/sessionMessagePlaceholder"
-                    android:inputType="textMultiLine"
+                    android:inputType="textCapSentences|textMultiLine"
                     android:lines="2"
-                    android:maxLength="160"
                     android:nextFocusLeft="@+id/sessionDialogSetMessage"
                     android:nextFocusUp="@+id/sessionDialogSetMessage"
                     android:scrollbars="vertical"
                     android:singleLine="false"
                     android:text=""
-                    android:textAppearance="?android:attr/textAppearanceMedium"/>
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:maxLength="4096"/>
 
             </LinearLayout>
         </RelativeLayout>

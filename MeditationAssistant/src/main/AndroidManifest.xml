@@ -11,11 +11,12 @@
         android:label="@string/appNameShort"
         android:theme="@style/MeditationDarkTheme">
 
-        <activity
+       <activity
             android:name="net.openid.appauth.AuthorizationManagementActivity"
             android:exported="false"
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        
         <activity
             android:name="net.openid.appauth.RedirectUriReceiverActivity"
             android:exported="true" >
@@ -25,10 +26,10 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="net.gnu.meditationassistant" />
+                <data android:scheme="${applicationId}" />
             </intent-filter>
         </activity>
-        
+
         <!-- Services -->
         <activity
             android:name="net.gnu.meditationassistant.MainActivity"

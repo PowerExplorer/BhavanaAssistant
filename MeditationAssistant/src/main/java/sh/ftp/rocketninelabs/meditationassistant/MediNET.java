@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class MediNET {
-    public static Integer version = Integer.valueOf(6);
+    public static Integer version = 6;
     // API v1-5 was used on pre Android 4.1 (discontinued) releases
     // API v6 signifies non-discontinued (1.4.1+, Android 4.1+) app version
 
@@ -73,7 +73,7 @@ public class MediNET {
             minutes += 1;
         }
 
-        return String.valueOf(hours) + ":" + String.format("%02d", minutes);
+        return hours + ":" + String.format("%02d", minutes);
     }
 
     public void browseTo(MainActivity act, String page) {
@@ -150,7 +150,7 @@ public class MediNET {
         return false;
     }
 
-    public boolean deleteSessionByStarted(long started) {
+    public boolean deleteSessionByStarted(Long started) {
         if (task != null) {
             task.cancel(true);
         }
@@ -229,9 +229,9 @@ public class MediNET {
     public boolean saveSession(long updateSessionStarted, boolean manualposting, boolean posted) {
         boolean saved;
 
-        Long postedlong = Long.valueOf(0);
+        Long postedlong = new Long(0);
         if (posted) {
-            postedlong = Long.valueOf(1);
+            postedlong = new Long(1);
         }
 
         // Only add streak if there isn't already a session for that day

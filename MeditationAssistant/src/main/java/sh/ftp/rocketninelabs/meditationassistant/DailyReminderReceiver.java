@@ -8,13 +8,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.provider.Settings;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+
+//import androidx.core.app.NotificationCompat;
+//import androidx.core.app.TaskStackBuilder;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+import android.support.v4.app.*;
 
 public class DailyReminderReceiver extends BroadcastReceiver {
     MeditationAssistant ma = null;
@@ -100,12 +102,12 @@ public class DailyReminderReceiver extends BroadcastReceiver {
 
         String reminderTime = ma.getPrefs().getString("pref_daily_reminder_time", "19:00");
         String[] reminderTimeSplit = ((reminderTime != null && reminderTime != "") ? reminderTime : "19:00").split(":");
-        Integer reminderHour = Integer.valueOf(reminderTimeSplit[0]);
-        Integer reminderMinute = Integer.valueOf(reminderTimeSplit[1]);
+        int reminderHour = Integer.parseInt(reminderTimeSplit[0]);
+        int reminderMinute = Integer.parseInt(reminderTimeSplit[1]);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, reminderHour.intValue());
-        calendar.set(Calendar.MINUTE, reminderMinute.intValue());
+        calendar.set(Calendar.HOUR_OF_DAY, reminderHour);
+        calendar.set(Calendar.MINUTE, reminderMinute);
         calendar.set(Calendar.SECOND, 0);
 
         if (Calendar.getInstance().getTimeInMillis() > calendar.getTimeInMillis()) {

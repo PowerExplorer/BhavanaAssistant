@@ -7,7 +7,7 @@
         android:summary="@string/pref_showstreak_summary"
         android:title="@string/pref_showstreak"/>
 
-    <sh.ftp.rocketninelabs.meditationassistant.TimePreference
+    <net.gnu.meditationassistant.TimePreference
         android:defaultValue="4:00"
         android:key="pref_meditationstreakbuffer"
         android:title="@string/pref_meditationstreakbuffer"

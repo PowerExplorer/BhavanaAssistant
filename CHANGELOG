@@ -1,6 +1,21 @@
+1.5.9:
+- Add resources menu linking to how to meditate, /r/meditation, an overview of MediNET and replaying the tutorial
+- Add presets to tutorial
+- Add session volume preview
+- Add custom vibration patterns
+- Add timer position setting
+- Resolve possible crash when waking device
+- Resolve duration not being preselected when editing
+- Remove usage of Google Play Services (was previously used in releases on Google Play and Amazon)
+
+1.5.8:
+- Resolve minor sound delay by preloading sounds
+- Increase session message maximum length from 160 to 4096
+
 1.5.7:
 - Added preset widgets
 - Removed "Set to silent" notification control setting (use "Alarms only" instead)
+- Resolve sound/vibration delays on some devices
 
 1.5.6:
 - Sessions may now be imported from previous exports (CSV files)

@@ -100,13 +100,13 @@ public class CompleteActivity extends Activity {
         getMeditationAssistant().getMediNET().session.started = getMeditationAssistant()
                 .getTimeStartMeditate();
         if (getMeditationAssistant().getTimerMode().equals("endat")) {
-            Log.d("MeditationAssistant", String.valueOf(Math.min(timestamp, getMeditationAssistant().getTimeToStopMeditate())) + " - "
-                    + String.valueOf(getMeditationAssistant().getTimeStartMeditate()) + " - " + String.valueOf(getMeditationAssistant().pausetime));
+            Log.d("MeditationAssistant", Math.min(timestamp, getMeditationAssistant().getTimeToStopMeditate()) + " - "
+                    + getMeditationAssistant().getTimeStartMeditate() + " - " + getMeditationAssistant().pausetime);
             getMeditationAssistant().getMediNET().session.length = Math.min(timestamp, getMeditationAssistant().getTimeToStopMeditate())
                     - getMeditationAssistant().getTimeStartMeditate() - getMeditationAssistant().pausetime;
         } else {
-            Log.d("MeditationAssistant", String.valueOf(timestamp) + " - "
-                    + String.valueOf(getMeditationAssistant().getTimeStartMeditate()) + " - " + String.valueOf(getMeditationAssistant().pausetime));
+            Log.d("MeditationAssistant", timestamp + " - "
+                    + getMeditationAssistant().getTimeStartMeditate() + " - " + getMeditationAssistant().pausetime);
             getMeditationAssistant().getMediNET().session.length = timestamp
                     - getMeditationAssistant().getTimeStartMeditate() - getMeditationAssistant().pausetime;
         }
@@ -118,8 +118,7 @@ public class CompleteActivity extends Activity {
         getMeditationAssistant().setTimeToStopMeditate(0);
 
         Log.d("MeditationAssistant",
-                "Session length: "
-                        + String.valueOf(getMeditationAssistant().getMediNET().session.length)
+                "Session length: " + getMeditationAssistant().getMediNET().session.length
         );
         if (getMeditationAssistant().getMediNET().session.length > 0) {
             TextView txtDuration = (TextView) findViewById(R.id.txtDuration);
@@ -138,16 +137,10 @@ public class CompleteActivity extends Activity {
                 txtDuration.setTextSize(200);
             } else { // Normal
                 txtDuration.setTextSize(153);
-            }
-
+			}
             String finishSoundPath = getMeditationAssistant().getPrefs().getString("pref_meditation_sound_finish", "");
-            if (!manual && !finishSoundPath.equals("none")) {
-                if (finishSoundPath.equals("custom")) {
-                    finishSoundPath = getMeditationAssistant().getPrefs().getString("pref_meditation_sound_finish_custom", "");
-                    getMeditationAssistant().playSound(0, finishSoundPath, true);
-                } else {
-                    getMeditationAssistant().playSound(MeditationSounds.getMeditationSound(finishSoundPath), "", true);
-                }
+            if (!manual) {
+                getMeditationAssistant().notifySession(2, false, false);
             } else {
                 getMeditationAssistant().restoreVolume();
             }
@@ -155,11 +148,7 @@ public class CompleteActivity extends Activity {
             getMeditationAssistant().restoreVolume();
         }
 
-        getMeditationAssistant().utility.initializeTracker(this);
-
         if (!manual) {
-            getMeditationAssistant().vibrateDevice();
-
             String autosave = getMeditationAssistant().getPrefs().getString("pref_autosave", "");
             if (autosave.equals("save")) {
                 saveMediNET(null);
@@ -236,33 +225,6 @@ public class CompleteActivity extends Activity {
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        getMeditationAssistant().utility.trackingStart(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        getMeditationAssistant().utility.trackingStop(this);
     }
 
     public void postMediNET(View view) {

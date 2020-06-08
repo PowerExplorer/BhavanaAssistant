@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -27,18 +28,18 @@ import android.os.Looper;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+//import androidx.annotation.RequiresApi;
+//import androidx.core.app.NotificationCompat;
 
 import com.nononsenseapps.filepicker.FilePickerActivity;
 import com.nononsenseapps.filepicker.Utils;
@@ -55,6 +56,8 @@ import net.openid.appauth.ResponseTypeValues;
 //import org.acra.annotation.AcraHttpSender;
 //import org.acra.data.StringFormat;
 //import org.acra.sender.HttpSender;
+//import org.apache.commons.lang3.ArrayUtils;
+//import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -80,7 +83,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Pattern;
+import android.support.annotation.*;
+import android.support.v4.app.*;
+import android.view.*;
+//import org.apache.commons.lang3.StringUtils;
+//import org.apache.commons.lang3.ArrayUtils;
 
 //@AcraCore(buildConfigClass = BuildConfig.class, reportFormat = StringFormat.KEY_VALUE_LIST)
 //@AcraHttpSender(httpMethod = HttpSender.Method.POST, uri = "https://medinet.rocketnine.space/acra/acra.php")
@@ -92,8 +102,6 @@ public class MeditationAssistant extends Application {
     public static String ACTION_PRESET = "net.gnu.meditationassistant.PRESET";
     public static String ACTION_REMINDER = "net.gnu.meditationassistant.DAILY_NOTIFICATION";
     public static String ACTION_UPDATED = "net.gnu.meditationassistant.DAILY_NOTIFICATION_UPDATED";
-
-    public static int REQUEST_FIT = 22;
 
     public static int CSV_COLUMN_COUNT = 5;
 
@@ -109,7 +117,6 @@ public class MeditationAssistant extends Application {
     public PendingIntent reminderPendingIntent = null;
     public String theme = null;
     public String marketName = null;
-    public UtilityMA utility = new UtilityMA();
     public Integer previous_volume = null;
     private String appVersion = null;
     private long timeToStopMeditate = 0;
@@ -137,8 +144,10 @@ public class MeditationAssistant extends Application {
     private SharedPreferences prefs = null;
     private AlarmManager am;
     private WakeLocker wakeLocker = new WakeLocker();
+    private Lock wakeLockerLock = new ReentrantLock();
     String pausedTimerHoursMinutes;
     String pausedTimerSeconds;
+    private HashMap<String, MediaPlayer> mediaPlayers = new HashMap<String, MediaPlayer>();
 
     private AlertDialog sessionDialog = null;
     private int sessionDialogStartedYear = -1;
@@ -290,21 +299,11 @@ public class MeditationAssistant extends Application {
         return string.substring(0, 1).toUpperCase() + string.substring(1).toLowerCase();
     }
 
-    public boolean canVibrate() {
-        try {
-            Vibrator vi = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            return vi.hasVibrator();
-        } catch (NoSuchMethodError e) {
-        } catch (Exception e) {
-        }
-        return true;
-    }
-
     public void restoreVolume() {
         if (previous_volume != null) {
             try {
                 AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, previous_volume, 0);
+                mAudioManager.setStreamVolume(AudioManager.STREAM_ALARM, previous_volume.intValue(), 0);
             } catch (java.lang.SecurityException e) {
                 // Do nothing
             }
@@ -484,11 +483,11 @@ public class MeditationAssistant extends Application {
 
     public void setMediNET(MediNET medi) {
         medinet = medi;
-        Log.d("MeditationAssistant", "Session: " + String.valueOf(medinet));
+        Log.d("MeditationAssistant", "Session: " + medinet);
     }
 
     public String getMediNETKey() {
-        Log.d("MeditationAssistant", "getMediNETKey() - medinetkey: " + String.valueOf(medinetkey) + " prefs: " + getPrefs().getString("key", ""));
+        Log.d("MeditationAssistant", "getMediNETKey() - medinetkey: " + medinetkey + " prefs: " + getPrefs().getString("key", ""));
         if (medinetkey == null) {
             medinetkey = getPrefs().getString("key", "");
         }
@@ -505,17 +504,33 @@ public class MeditationAssistant extends Application {
         return medinetprovider;
     }
 
-    public void playSound(int soundresource, String soundpath, final boolean restoreVolume) {
-        final String wakeLockID = acquireWakeLock(false);
+    public void cacheSound(int soundresource, String soundpath) {
+        String cacheKey = soundpath;
+        if (cacheKey.equals("")) {
+            cacheKey = Integer.toString(soundresource);
+        }
+        if (mediaPlayers.containsKey(cacheKey)) {
+            return;
+        }
 
         MediaPlayer mp = new MediaPlayer();
-        mp.setAudioStreamType(AudioManager.STREAM_ALARM);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .build();
+            mp.setAudioAttributes(audioAttributes);
+        } else {
+            mp.setAudioStreamType(AudioManager.STREAM_ALARM);
+        }
         try {
             if (!soundpath.equals("")) {
                 mp.setDataSource(getApplicationContext(), Uri.parse(soundpath));
             } else {
                 mp.setDataSource(getApplicationContext(), Uri.parse("android.resource://" + getPackageName() + "/" + soundresource));
             }
+
+            mp.prepareAsync();
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -524,11 +539,76 @@ public class MeditationAssistant extends Application {
                 soundLabel = String.valueOf(soundresource);
             }
             Log.e("MeditationAssistant", "Failed to load sound: " + soundLabel);
+            return;
+        }
 
-            if (restoreVolume) {
-                restoreVolume();
+        mediaPlayers.put(cacheKey, mp);
+    }
+
+    public void cacheSessionSounds() {
+        String label;
+        for (int i = 0; i < 3; i++) {
+            switch (i) {
+                case 0:
+                    label = "start";
+                    break;
+                case 1:
+                    label = "interval";
+                    break;
+                case 2:
+                    label = "finish";
+                    break;
+                default:
+                    return;
             }
 
+            SharedPreferences prefs = getPrefs();
+            String soundPath = prefs.getString("pref_meditation_sound_" + label, "");
+            if (!soundPath.equals("none")) {
+                if (soundPath.equals("custom")) {
+                    cacheSound(0, prefs.getString("pref_meditation_sound_" + label + "_custom", ""));
+                } else {
+                    cacheSound(MeditationSounds.getMeditationSound(soundPath), "");
+                }
+            }
+        }
+    }
+
+    public void clearSoundCache() {
+        for (MediaPlayer mp : mediaPlayers.values()) {
+            try {
+                mp.stop();
+            } catch (Exception e) {
+                // Do nothing
+            }
+            try {
+                mp.release();
+            } catch (Exception e) {
+                // Do nothing
+            }
+        }
+		
+        mediaPlayers.clear();
+    }
+
+    public void playSound(int soundresource, String soundpath, final boolean restoreVolume) {
+        final String wakeLockID = acquireWakeLock(false);
+
+        String cacheKey = soundpath;
+        if (cacheKey.equals("")) {
+            cacheKey = Integer.toString(soundresource);
+        }
+        if (!mediaPlayers.containsKey(cacheKey)) {
+            cacheSound(soundresource, soundpath);
+        }
+        if (!mediaPlayers.containsKey(cacheKey)) {
+            Log.d("MeditationAssistant", "Failed to cache sound");
+            return; // Failed to load sound
+        }
+        MediaPlayer mp = mediaPlayers.get(cacheKey);
+
+        if (mp.isPlaying()) {
+            Log.d("MeditationAssistant", "Failed to play sound: already playing");
             releaseWakeLock(wakeLockID);
             return;
         }
@@ -540,20 +620,24 @@ public class MeditationAssistant extends Application {
                     MeditationAssistant.this.restoreVolume();
                 }
 
-                mp.release();
+                try {
+                    mp.stop();
+                } catch (Exception e) {
+                    // Do nothing
+                }
+                try {
+                    mp.prepareAsync();
+                } catch (Exception e) {
+                    // Do nothing
+                }
+
                 MeditationAssistant.this.releaseWakeLock(wakeLockID);
-            }
-        });
-        mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.start();
             }
         });
 
         try {
-            mp.prepare();
-        } catch (IOException e) {
+            mp.start();
+        } catch (Exception e) {
             e.printStackTrace();
 
             if (restoreVolume) {
@@ -561,6 +645,46 @@ public class MeditationAssistant extends Application {
             }
 
             releaseWakeLock(wakeLockID);
+        }
+    }
+
+    public void notifySession(int phase, boolean skipVibration, boolean restoreVolume) {
+        String label;
+        switch (phase) {
+            case 0:
+                label = "start";
+                break;
+            case 1:
+                label = "interval";
+                break;
+            case 2:
+                label = "finish";
+                break;
+            default:
+                return;
+        }
+        SharedPreferences prefs = getPrefs();
+
+        // Play sound
+        String soundPath = prefs.getString("pref_meditation_sound_" + label, "");
+        if (!soundPath.equals("none")) {
+            if (soundPath.equals("custom")) {
+                playSound(0, prefs.getString("pref_meditation_sound_" + label + "_custom", ""), restoreVolume);
+            } else {
+                playSound(MeditationSounds.getMeditationSound(soundPath), "", restoreVolume);
+            }
+        }
+
+        // Vibrate device
+        if (!skipVibration) {
+            String vibration = prefs.getString("pref_meditation_vibrate_" + label, "");
+            if (!vibration.equals("none")) {
+                if (vibration.equals("custom")) {
+                    vibrateDevice(prefs.getString("pref_meditation_vibrate_" + label + "_custom", ""));
+                } else {
+                    vibrateDevice(vibration);
+                }
+            }
         }
     }
 
@@ -630,7 +754,7 @@ public class MeditationAssistant extends Application {
         boolean sessionexiststoday = false;
 
         while (true) {
-            Log.d("MeditationAssistant", "Checking (" + String.valueOf(daysback) + ") " + String.valueOf(dayCalendar));
+            Log.d("MeditationAssistant", "Checking (" + daysback + ") " + dayCalendar);
             if (db.numSessionsByDate(dayCalendar) > 0) {
                 recalculatedstreak++;
 
@@ -645,11 +769,11 @@ public class MeditationAssistant extends Application {
             dayCalendar.add(Calendar.DATE, -1);
         }
 
-        long currentStreak = getMeditationStreak().get(0).longValue();
-        if (currentStreak < recalculatedstreak) {
+        Long currentStreak = getMeditationStreak().get(0);
+        if (currentStreak.longValue() < recalculatedstreak) {
             setMeditationStreak(Integer.valueOf(recalculatedstreak), sessionexiststoday ? getStreakExpiresTwoDaysTimestamp() : getStreakExpiresOneDayTimestamp());
-        } else if (currentStreak > recalculatedstreak) {
-            showStreakDifferenceWarning((int)currentStreak, recalculatedstreak, sessionexiststoday, activity);
+        } else if (currentStreak.longValue() > recalculatedstreak) {
+            showStreakDifferenceWarning(currentStreak.intValue(), recalculatedstreak, sessionexiststoday, activity);
         }
     }
 
@@ -657,13 +781,13 @@ public class MeditationAssistant extends Application {
         long timestamp = System.currentTimeMillis() / 1000;
 
         if (meditationstreak == null || meditationstreakexpires < 1) {
-            meditationstreak = getPrefs().getInt("meditationstreak", 0);
+            meditationstreak = Integer.valueOf(getPrefs().getInt("meditationstreak", 0));
             meditationstreakexpires = getPrefs().getLong("meditationstreakexpires", 0);
         }
 
         if (meditationstreakexpires > 0 && meditationstreakexpires < timestamp) {
             // Streak window has passed
-            meditationstreak = 0;
+            meditationstreak = Integer.valueOf(0);
             meditationstreakexpires = 0;
 
             getPrefs().edit().putInt("meditationstreak", meditationstreak.intValue())
@@ -672,8 +796,8 @@ public class MeditationAssistant extends Application {
         }
 
         ArrayList<Long> streak = new ArrayList<>();
-        streak.add(Long.valueOf(meditationstreak));
-        streak.add(meditationstreakexpires);
+        streak.add(Long.valueOf(meditationstreak.intValue()));
+        streak.add(Long.valueOf(meditationstreakexpires));
         return streak;
     }
 
@@ -685,7 +809,7 @@ public class MeditationAssistant extends Application {
         ArrayList<Long> streak = getMeditationStreak();
         long streakday = streak.get(0).longValue();
         long streakexpires = streak.get(1).longValue();
-        Log.d("MeditationAssistant", "addMeditationStreak() - Streak: " + String.valueOf(streakday) + " Expires: in " + String.valueOf(streakexpires - getTimestamp()) + " seconds");
+        Log.d("MeditationAssistant", "addMeditationStreak() - Streak: " + streakday + " Expires: in " + (streakexpires - getTimestamp()) + " seconds");
         if (streakday == 0 || streakexpires - getTimestamp() < 86400) {
             streakday++;
 
@@ -744,7 +868,7 @@ public class MeditationAssistant extends Application {
     public int timePreferenceValueToSeconds(String timePreferenceValue, String defaultValue) {
         try {
             String[] timeValueSplit = ((timePreferenceValue != null && timePreferenceValue != "") ? timePreferenceValue : defaultValue).split(":");
-            return (Integer.valueOf(timeValueSplit[0]).intValue() * 60) + Integer.valueOf(timeValueSplit[1]).intValue();
+            return (Integer.parseInt(timeValueSplit[0]) * 60) + Integer.parseInt(timeValueSplit[1]);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -762,7 +886,7 @@ public class MeditationAssistant extends Application {
                 if (!duration_separated[0].trim().equals("")) {
                     try {
                         newHours = String.valueOf(Integer
-                                .valueOf(duration_separated[0]));
+                                .valueOf(duration_separated[0].trim()));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -772,7 +896,7 @@ public class MeditationAssistant extends Application {
                 if (!duration_separated[1].trim().equals("")) {
                     try {
                         newMinutes = String.valueOf(Integer
-                                .valueOf(duration_separated[1]));
+                                .valueOf(duration_separated[1].trim()));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -781,25 +905,25 @@ public class MeditationAssistant extends Application {
                 }
             } else {
                 try {
-                    newMinutes = String.valueOf(Integer.valueOf(duration));
+                    newMinutes = String.valueOf(Integer.valueOf(duration.trim()));
                     newHours = "0";
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
-            if (Integer.valueOf(newMinutes).intValue() >= 60) {
+            if (Integer.parseInt(newMinutes) >= 60) {
                 newHours = String.format("%d",
-										 Integer.valueOf(Integer.valueOf(newHours).intValue() + Integer
-                                .valueOf(newMinutes).intValue() / 60)
+										 Integer.valueOf(Integer.parseInt(newHours) + Integer
+                                .parseInt(newMinutes) / 60)
                 );
                 newMinutes = String.format("%02d",
-										   Integer.valueOf(Integer.valueOf(newMinutes).intValue() % 60));
+										   Integer.valueOf(Integer.parseInt(newMinutes) % 60));
             }
 
             if (!newHours.equals("-1") && !newMinutes.equals("-1")
                     && !(newHours.equals("0") && newMinutes.equals("0"))) {
-                ArrayList<String> formatted_duration = new ArrayList<String>();
+                ArrayList<String> formatted_duration = new ArrayList<>();
                 formatted_duration.add(newHours);
                 formatted_duration.add(String.format("%02d",
                         Integer.valueOf(newMinutes)));
@@ -822,7 +946,7 @@ public class MeditationAssistant extends Application {
                 if (!duration_separated[0].trim().equals("")) {
                     try {
                         newHours = String.valueOf(Integer
-                                .valueOf(duration_separated[0]));
+                                .valueOf(duration_separated[0].trim()));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -832,7 +956,7 @@ public class MeditationAssistant extends Application {
                 if (!duration_separated[1].trim().equals("")) {
                     try {
                         newMinutes = String.valueOf(Integer
-                                .valueOf(duration_separated[1]));
+                                .valueOf(duration_separated[1].trim()));
                         if (duration_separated[1].trim().length() < 2) {
                             shorthand = true;
                         }
@@ -844,7 +968,7 @@ public class MeditationAssistant extends Application {
                 }
             } else {
                 try {
-                    newHours = String.valueOf(Integer.valueOf(duration));
+                    newHours = String.valueOf(Integer.valueOf(duration.trim()));
                     newMinutes = "0";
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -852,27 +976,27 @@ public class MeditationAssistant extends Application {
             }
 
             Log.d("MeditationAssistant", "Formatted end at duration newMinutes: " + newMinutes);
-            if (shorthand && Integer.valueOf(newMinutes).intValue() > 0 && Integer.valueOf(newMinutes).intValue() <= 5) { // shorthand 3 -> 30, 4 -> 40...
+            if (shorthand && Integer.parseInt(newMinutes) > 0 && Integer.parseInt(newMinutes) <= 5) { // shorthand 3 -> 30, 4 -> 40...
                 newMinutes = String.format("%02d",
-										   Integer.valueOf(Integer.valueOf(newMinutes).intValue() * 10));
-            } else if (Integer.valueOf(newMinutes).intValue() >= 60) {
+										   Integer.valueOf(Integer.parseInt(newMinutes) * 10));
+            } else if (Integer.parseInt(newMinutes) >= 60) {
                 newHours = String.format("%d",
-										 Integer.valueOf(Integer.valueOf(newHours).intValue() + Integer
-                                .valueOf(newMinutes).intValue() / 60)
+										 Integer.valueOf(Integer.parseInt(newHours) + Integer
+														 .parseInt(newMinutes) / 60)
                 );
                 newMinutes = String.format("%02d",
-										   Integer.valueOf(Integer.valueOf(newMinutes).intValue() % 60));
+										   Integer.valueOf(Integer.parseInt(newMinutes) % 60));
             }
 
-            if (Integer.valueOf(newHours).intValue() == 0 || Integer.valueOf(newHours).intValue() > 24) {
+            if (Integer.parseInt(newHours) == 0 || Integer.parseInt(newHours) > 24) {
                 return null; // Invalid hour for time
-            } else if (Integer.valueOf(newHours).intValue() > 12) {
-                newHours = String.valueOf(Integer.valueOf(newHours).intValue() - 12); // Subtract 12 hours if 24 hour time was provided
+            } else if (Integer.parseInt(newHours) > 12) {
+                newHours = String.valueOf(Integer.parseInt(newHours) - 12); // Subtract 12 hours if 24 hour time was provided
             }
 
             if (!newHours.equals("-1") && !newMinutes.equals("-1")
                     && !(newHours.equals("0") && newMinutes.equals("0"))) {
-                ArrayList<String> formatted_duration = new ArrayList<String>();
+                ArrayList<String> formatted_duration = new ArrayList<>();
                 formatted_duration.add(newHours);
                 formatted_duration.add(String.format("%02d",
                         Integer.valueOf(newMinutes)));
@@ -893,7 +1017,7 @@ public class MeditationAssistant extends Application {
 
     public boolean getRememberDuration() {
         if (rememberduration == null) {
-            rememberduration = getPrefs().getBoolean("pref_rememberlasttimer", true);
+            rememberduration = Boolean.valueOf(getPrefs().getBoolean("pref_rememberlasttimer", true));
         }
         return rememberduration;
     }
@@ -969,7 +1093,7 @@ public class MeditationAssistant extends Application {
         getPrefs().edit().putLong("last_reminder", getTimestamp()).apply();
         //(new Exception()).printStackTrace();
         Log.d("MeditationAssistant", "Setting time to stop meditating: "
-                + String.valueOf(timeToStopMeditate));
+                + timeToStopMeditate);
     }
 
     public String getTimerMode() {
@@ -985,17 +1109,17 @@ public class MeditationAssistant extends Application {
         getPrefs().edit().putString("pref_timer_mode", timerMode).apply();
     }
 
-    public Integer getWebViewScale() {
+    public int getWebViewScale() {
         if (webview_scale == null) {
             webview_scale = Integer.valueOf(getPrefs().getInt("webviewscale", 100));
         }
-        return webview_scale;
+        return webview_scale.intValue();
     }
 
     public void setWebViewScale(int scale) {
-        webview_scale = Integer.valueOf(scale);
+        webview_scale = new Integer(scale);
 
-        getPrefs().edit().putInt("webviewscale", scale).apply();
+        getPrefs().edit().putInt("webviewscale", webview_scale.intValue()).apply();
     }
 
     public void hideNotification() {
@@ -1008,16 +1132,16 @@ public class MeditationAssistant extends Application {
 				@Override
 				public void run() {
 					Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
+					
 				}
-            });
+				
+                    });
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         //ACRA.init(this);
-
-        utility.ma = this;
 
         CookieManager cookieManager = new CookieManager();
         CookieHandler.setDefault(cookieManager);
@@ -1033,8 +1157,18 @@ public class MeditationAssistant extends Application {
 
         Log.d("MeditationAssistant",
                 "Meditation Assistant running (" + applaunches + " launches) on API level "
-                        + String.valueOf(Build.VERSION.SDK_INT)
+                        + Build.VERSION.SDK_INT
         );
+
+        if (getPrefs().getBoolean("pref_vibrate", false)) {
+            getPrefs()
+                    .edit()
+                    .putString("pref_meditation_vibrate_start", "medium")
+                    .putString("pref_meditation_vibrate_interval", "medium")
+                    .putString("pref_meditation_vibrate_finish", "medium")
+                    .putBoolean("pref_vibrate", false)
+                    .apply();
+        }
 
         getPrefs().registerOnSharedPreferenceChangeListener(sharedPrefslistener);
 
@@ -1096,13 +1230,6 @@ public class MeditationAssistant extends Application {
         return result.toString();
     }
 
-    public boolean sendUsageReports() {
-        if (sendusage == null) {
-            sendusage = getPrefs().getBoolean("pref_sendusage", true);
-        }
-        return sendusage;
-    }
-
     public void setMediNETKey(String key, String provider) {
         Log.d("MeditationAssistant", "Setting medinet key: " + key + " - " + provider);
         medinetkey = key;
@@ -1129,17 +1256,17 @@ public class MeditationAssistant extends Application {
         date.setTimeZone(TimeZone.getDefault());
         long timestamp = date.getTimeInMillis() / 1000;
         Log.d("MeditationAssistant",
-                "Streak: " + String.valueOf(meditationstreak) + ", expires: "
-                        + String.valueOf(expires) + " (in "
-                        + String.valueOf(expires - timestamp) + " seconds)"
+                "Streak: " + meditationstreak + ", expires: "
+                        + expires + " (in "
+                        + (expires - timestamp) + " seconds)"
         );
 
         getPrefs().edit().putInt("meditationstreak", meditationstreak.intValue()).putLong("meditationstreakexpires", meditationstreakexpires).apply();
 
-        if (meditationstreak != null && meditationstreak.intValue() == 1) {
+        if (meditationstreak.intValue() == 1) {
             getPrefs().edit().putBoolean("meditationstreakwarningshown", false).apply();
         }
-        if (meditationstreak != null && meditationstreak.intValue() > getLongestMeditationStreak()) {
+        if (meditationstreak.intValue() > getLongestMeditationStreak()) {
             setLongestMeditationStreak(meditationstreak.intValue());
         }
 
@@ -1169,7 +1296,7 @@ public class MeditationAssistant extends Application {
         }
         pausetime += thispausetime;
 
-        Log.d("MeditationAssistant", "PAUSE: Un-paused.  Paused for " + String.valueOf(thispausetime) + " seconds (" + String.valueOf(pausetime) + " total)");
+        Log.d("MeditationAssistant", "PAUSE: Un-paused.  Paused for " + thispausetime + " seconds (" + pausetime + " total)");
 
         ispaused = false;
 
@@ -1181,8 +1308,10 @@ public class MeditationAssistant extends Application {
 				@Override
 				public void run() {
 					Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
+					
 				}
-          });
+				
+                    });
     }
 
     public AlertDialog showAnnouncementDialog(String title) {
@@ -1194,8 +1323,7 @@ public class MeditationAssistant extends Application {
 
         if (getMediNET().activity != null
                 && !getMediNET().announcement.equals("")) {
-            AlertDialog announceDialog = new AlertDialog.Builder(
-                    getMediNET().activity)
+            AlertDialog announceDialog = new AlertDialog.Builder(getMediNET().activity)
                     .setPositiveButton(R.string.dismiss,
                             new DialogInterface.OnClickListener() {
                                 @Override
@@ -1207,21 +1335,11 @@ public class MeditationAssistant extends Application {
                     )
                     .setTitle(title == null ? getString(R.string.announcement) : title)
                     .setMessage(medinet.announcement)
-                    .setIcon(
-                            getMediNET().activity
-                                    .getResources()
-                                    .getDrawable(
-                                            getTheme()
-                                                    .obtainStyledAttributes(
-                                                            getMATheme(true),
-                                                            new int[]{R.attr.actionIconGoToToday})
-                                                    .getResourceId(0, 0)
-                                    )
-                    )
-                    .setCancelable(false).create();
+                    .setIcon(getMediNET().activity.getResources().getDrawable(getTheme().obtainStyledAttributes(getMATheme(true), new int[]{R.attr.actionIconGoToToday}).getResourceId(0, 0)))
+                    .setCancelable(false)
+                    .create();
 
             announceDialog.show();
-
             return announceDialog;
         }
 
@@ -1273,17 +1391,16 @@ public class MeditationAssistant extends Application {
         }
         getPrefs().edit().putBoolean("meditationstreakwarningshown", true).apply();
 
-        AlertDialog streakDifferenceDialog = new AlertDialog.Builder(
-                activity)
+        AlertDialog streakDifferenceDialog = new AlertDialog.Builder(activity)
                 .setPositiveButton(R.string.yes,
 			new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog,
 									int id) {
 					setMeditationStreak(newstreak, twodays ? getStreakExpiresTwoDaysTimestamp() : getStreakExpiresOneDayTimestamp());
+					
 				}
-				}
-                )
+			}  )
                 .setNegativeButton(R.string.no,
 			new DialogInterface.OnClickListener() {
 				@Override
@@ -1295,12 +1412,9 @@ public class MeditationAssistant extends Application {
                 )
                 .setTitle(R.string.warning)
                 .setMessage(String.format(getString(R.string.streakdifferencewarning), oldstreak, newstreak))
-                .setIcon(activity.getResources().getDrawable(
-                        getTheme().obtainStyledAttributes(getMATheme(true),
-                                new int[]{R.attr.actionIconGoToToday}).getResourceId(0, 0)
-                        )
-                )
-                .setCancelable(false).create();
+                .setIcon(activity.getResources().getDrawable(getTheme().obtainStyledAttributes(getMATheme(true), new int[]{R.attr.actionIconGoToToday}).getResourceId(0, 0)))
+                .setCancelable(false)
+                .create();
 
         streakDifferenceDialog.show();
     }
@@ -1541,13 +1655,7 @@ public class MeditationAssistant extends Application {
         });
 
         sessionDialog = new AlertDialog.Builder(sessionDialogActivity)
-                .setIcon(
-                        getResources().getDrawable(
-                                getTheme().obtainStyledAttributes(getMATheme(true),
-                                        new int[]{session._id == 0 ? R.attr.actionIconNew : R.attr.actionIconGoToToday})
-                                        .getResourceId(0, 0)
-                        )
-                )
+                .setIcon(getResources().getDrawable(getTheme().obtainStyledAttributes(getMATheme(true), new int[]{session._id == 0 ? R.attr.actionIconNew : R.attr.actionIconGoToToday}).getResourceId(0, 0)))
                 .setTitle(getString(session._id == 0 ? R.string.addSession : R.string.editSession))
                 .setView(sessionDialogView)
                 .setPositiveButton(getString(session._id == 0 ? R.string.add : R.string.edit), new DialogInterface.OnClickListener() {
@@ -1611,9 +1719,7 @@ public class MeditationAssistant extends Application {
                     }
 
                     AlertDialog postSessionDialog = new AlertDialog.Builder(activity)
-                            .setIcon(getResources().getDrawable(getTheme().obtainStyledAttributes(getMATheme(true),
-                                    new int[]{R.attr.actionIconInfo})
-                                    .getResourceId(0, 0)))
+                            .setIcon(getResources().getDrawable(getTheme().obtainStyledAttributes(getMATheme(true), new int[]{R.attr.actionIconInfo}).getResourceId(0, 0)))
                             .setTitle(getString(R.string.sessionPosted))
                             .setMessage(getString(R.string.postUpdatedSession))
                             .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
@@ -1712,13 +1818,13 @@ public class MeditationAssistant extends Application {
         } else {
             String summary = "";
             if (sessionDialogLengthHour > 0) {
-                summary += String.valueOf(sessionDialogLengthHour) + " hour";
+                summary += sessionDialogLengthHour + " hour";
                 if (sessionDialogLengthHour > 1) {
                     summary += "s";
                 }
             }
             if (sessionDialogLengthMinute > 0) {
-                summary += " " + String.valueOf(sessionDialogLengthMinute) + " minute";
+                summary += " " + sessionDialogLengthMinute + " minute";
                 if (sessionDialogLengthMinute > 1) {
                     summary += "s";
                 }
@@ -1799,15 +1905,15 @@ public class MeditationAssistant extends Application {
 
     public void completeSessionDialog(SessionSQL session, boolean postSession) {
         ArrayList<Long> sc = getSessionDialogValues();
-        long started = sc.get(0).longValue();
-        long completed = sc.get(1).longValue();
-        long length = sc.get(2).longValue();
+        Long started = sc.get(0);
+        Long completed = sc.get(1);
+        Long length = sc.get(2);
 
         if (postSession) {
             getMediNET().resetSession();
-            getMediNET().session.started = started;
-            getMediNET().session.length = length;
-            getMediNET().session.completed = completed;
+            getMediNET().session.started = started.longValue();
+            getMediNET().session.length = length.longValue();
+            getMediNET().session.completed = completed.longValue();
             getMediNET().session.message = sessionDialogMessage.getText().toString().trim();
             getMediNET().session.modified = getTimestamp();
 
@@ -1822,8 +1928,8 @@ public class MeditationAssistant extends Application {
 					}
             });
         } else {
-            if (db.addSession(new SessionSQL((long) 0, started, completed, length, sessionDialogMessage.getText().toString().trim(), (long) 0, (long) 0, getTimestamp()), sessionDialogUpdateSessionStarted)) {
-                if (session._id == 0) { // Add session
+            if (db.addSession(new SessionSQL(new Long(0), started, completed, length, sessionDialogMessage.getText().toString().trim(), new Long(0), new Long(0), getTimestamp()), sessionDialogUpdateSessionStarted)) {
+                if (session._id.longValue() == 0) { // Add session
                     shortToast(getString(R.string.sessionAdded));
                 } else {
                     shortToast(getString(R.string.sessionEdited));
@@ -1867,17 +1973,7 @@ public class MeditationAssistant extends Application {
                     )
                     .setTitle(R.string.downloadsessionstitle)
                     .setMessage(R.string.downloadsessionsmessage)
-                    .setIcon(
-                            getMediNET().activity
-                                    .getResources()
-                                    .getDrawable(
-                                            getTheme()
-                                                    .obtainStyledAttributes(
-                                                            getMATheme(true),
-                                                            new int[]{R.attr.actionIconDownCloud})
-                                                    .getResourceId(0, 0)
-                                    )
-                    )
+                    .setIcon(getMediNET().activity.getResources().getDrawable(getTheme().obtainStyledAttributes(getMATheme(true), new int[]{R.attr.actionIconDownCloud}).getResourceId(0, 0)))
                     .create();
 
             staleDataDialog.show();
@@ -1903,20 +1999,10 @@ public class MeditationAssistant extends Application {
 
     public void askToDonate(final Activity activity) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setIcon(
-                getResources()
-                        .getDrawable(
-                                getTheme()
-                                        .obtainStyledAttributes(
-                                                getMATheme(true),
-                                                new int[]{R.attr.actionIconInfo}
-                                        )
-                                        .getResourceId(0, 0)
-                        )
-        )
+        builder
+                .setIcon(getResources().getDrawable(getTheme().obtainStyledAttributes(getMATheme(true), new int[]{R.attr.actionIconInfo}).getResourceId(0, 0)))
                 .setTitle(getString(R.string.announcement))
-                .setMessage(
-                        getString(R.string.donate156))
+                .setMessage(getString(R.string.donate156))
                 .setPositiveButton(getString(R.string.donate),
                         new DialogInterface.OnClickListener() {
                             @Override
@@ -1929,25 +2015,16 @@ public class MeditationAssistant extends Application {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                             }
-                        }).show();
+                        })
+                .show();
     }
 
     public void showImportSessionsDialog(final Activity activity) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setIcon(
-                getResources()
-                        .getDrawable(
-                                getTheme()
-                                        .obtainStyledAttributes(
-                                                getMATheme(true),
-                                                new int[]{R.attr.actionIconForward}
-                                        )
-                                        .getResourceId(0, 0)
-                        )
-        )
+        builder
+                .setIcon(getResources().getDrawable(getTheme().obtainStyledAttributes(getMATheme(true), new int[]{R.attr.actionIconForward}).getResourceId(0, 0)))
                 .setTitle(getString(R.string.importsessions))
-                .setMessage(
-                        getString(R.string.importsessions_utc_or_local))
+                .setMessage(getString(R.string.importsessions_utc_or_local))
                 .setPositiveButton(getString(R.string.utc),
                         new DialogInterface.OnClickListener() {
                             @Override
@@ -1961,7 +2038,8 @@ public class MeditationAssistant extends Application {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 showFilePickerDialog(activity, SettingsActivity.FILEPICKER_IMPORT_SESSIONS_LOCAL, FilePickerActivity.MODE_FILE);
                             }
-                        }).show();
+                        })
+                .show();
     }
 
     public void importSessions(final Activity activity, Uri uri, boolean useLocalTimeZone) {
@@ -1995,7 +2073,7 @@ public class MeditationAssistant extends Application {
         }
         df.setTimeZone(tz);
 
-        final ArrayList<SessionSQL> sessions = new ArrayList<SessionSQL>();
+        final ArrayList<SessionSQL> sessions = new ArrayList<>();
         int existingSessions = 0;
 
         try {
@@ -2038,7 +2116,7 @@ public class MeditationAssistant extends Application {
                         throw new Exception();
                     }
 
-                    s._length = (lengthHours * 3600) + (lengthMinutes * 60);
+                    s._length = Long.valueOf((lengthHours * 3600) + (lengthMinutes * 60));
                 } catch (Exception e) {
                     longToast("Invalid row on line #" + i + ": invalid session length");
                     closeCSVReader(reader, inputfile);
@@ -2051,7 +2129,7 @@ public class MeditationAssistant extends Application {
                     }
 
                     startedDate = df.parse(d[2].trim());
-                    s._started = startedDate.getTime() / 1000;
+                    s._started = Long.valueOf(startedDate.getTime() / 1000);
                 } catch (Exception e) {
                     longToast("Invalid row on line #" + i + ": invalid session started date/time");
                     closeCSVReader(reader, inputfile);
@@ -2064,7 +2142,7 @@ public class MeditationAssistant extends Application {
                     }
 
                     completedDate = df.parse(d[3].trim());
-                    s._completed = completedDate.getTime() / 1000;
+                    s._completed = Long.valueOf(completedDate.getTime() / 1000);
                 } catch (Exception e) {
                     longToast("Invalid row on line #" + i + ": invalid session completed date/time");
                     closeCSVReader(reader, inputfile);
@@ -2075,7 +2153,7 @@ public class MeditationAssistant extends Application {
 
                 boolean existing = false;
                 for (int searchStarted = 0; searchStarted <= 59; searchStarted++) {
-                    if (db.numSessionsByStarted(s._started + searchStarted) != 0) {
+                    if (db.numSessionsByStarted(s._started.longValue() + searchStarted) != 0) {
                         existing = true;
                         break;
                     }
@@ -2099,13 +2177,7 @@ public class MeditationAssistant extends Application {
         }
 
         AlertDialog sessionsImportedDialog = new AlertDialog.Builder(activity)
-                .setIcon(
-                        getResources().getDrawable(
-                                getTheme().obtainStyledAttributes(getMATheme(true),
-                                        new int[]{R.attr.actionIconForward})
-                                        .getResourceId(0, 0)
-                        )
-                )
+                .setIcon(getResources().getDrawable(getTheme().obtainStyledAttributes(getMATheme(true), new int[]{R.attr.actionIconForward}).getResourceId(0, 0)))
                 .setTitle(getString(R.string.importsessions))
                 .setMessage(String.format(getString(R.string.importsessions_complete), existingSessions, sessions.size()))
                 .setPositiveButton(getString(R.string.wordimport), new DialogInterface.OnClickListener() {
@@ -2155,7 +2227,7 @@ public class MeditationAssistant extends Application {
         try {
             FileWriter outputfile = new FileWriter(file);
             CSVWriter writer = new CSVWriter(outputfile);
-            List<String[]> data = new ArrayList<String[]>();
+            List<String[]> data = new ArrayList<>();
 
             ArrayList<SessionSQL> sessions = db.getAllSessions();
 
@@ -2164,7 +2236,7 @@ public class MeditationAssistant extends Application {
 
             data.add(new String[]{"ID", "Length", "Started", "Completed", "Message"});
             for (SessionSQL s : sessions) {
-                data.add(new String[]{Long.toString(s._id), String.format(Locale.getDefault(), "%02d:%02d", TimeUnit.SECONDS.toHours(s._length), TimeUnit.SECONDS.toMinutes(s._length) % TimeUnit.HOURS.toMinutes(1)), df.format(s._started * 1000), df.format(s._completed * 1000), s._message});
+                data.add(new String[]{Long.toString(s._id), String.format(Locale.getDefault(), "%02d:%02d", TimeUnit.SECONDS.toHours(s._length.longValue()), TimeUnit.SECONDS.toMinutes(s._length.longValue()) % TimeUnit.HOURS.toMinutes(1)), df.format(s._started.longValue() * 1000), df.format(s._completed.longValue() * 1000), s._message});
             }
 
             writer.writeAll(data);
@@ -2179,17 +2251,11 @@ public class MeditationAssistant extends Application {
                 R.layout.sessions_exported,
                 (ViewGroup) activity.findViewById(R.id.sessionsExported_root));
 
-        TextView txtSessionsExportedPath = (TextView) exp.findViewById(R.id.txtSessionsExportedPath);
+        TextView txtSessionsExportedPath = exp.findViewById(R.id.txtSessionsExportedPath);
         txtSessionsExportedPath.setText(file.getPath());
 
         AlertDialog sessionsExportedDialog = new AlertDialog.Builder(activity)
-                .setIcon(
-                        getResources().getDrawable(
-                                getTheme().obtainStyledAttributes(getMATheme(true),
-                                        new int[]{R.attr.actionIconSignOut})
-                                        .getResourceId(0, 0)
-                        )
-                )
+                .setIcon(getResources().getDrawable(getTheme().obtainStyledAttributes(getMATheme(true), new int[]{R.attr.actionIconSignOut}).getResourceId(0, 0)))
                 .setTitle(getString(R.string.exportSessions))
                 .setView(exp)
                 .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
@@ -2220,28 +2286,75 @@ public class MeditationAssistant extends Application {
     }
 
     public void updateWidgets() {
-        AppWidgetManager man = AppWidgetManager
-                .getInstance(getApplicationContext());
-        /*int[] ids = man.getAppWidgetIds(new ComponentName(
-                getApplicationContext(), WidgetStreakProvider.class));*/
         Intent updateIntent = new Intent();
         updateIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         getApplicationContext().sendBroadcast(updateIntent);
     }
+	
+	public static long[] toPrimitive(final Long[] array) {
+		if (array == null) {
+			return null;
+		} else if (array.length == 0) {
+			return new long[0];
+		}
+		final long[] result = new long[array.length];
+		for (int i = 0; i < array.length; i++) {
+			result[i] = array[i].longValue();
+		}
+		return result;
+	}
+	
+	public static boolean isNumeric(final CharSequence cs) {
+		if (cs == null || cs.length() == 0) {
+			return false;
+		}
+		final int sz = cs.length();
+		for (int i = 0; i < sz; i++) {
+			if (!Character.isDigit(cs.charAt(i))) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+    public void vibrateDevice(String pattern) {
+        ArrayList<Long> p = new ArrayList<Long>();
+        if (pattern.equals("short")) {
+            p.add(new Long(110));
+            p.add(new Long(225));
+            p.add(new Long(110));
+        } else if (pattern.equals("medium")) {
+            p.add(new Long(420));
+            p.add(new Long(375));
+            p.add(new Long(420));
+        } else if (pattern.equals("long")) {
+            p.add(new Long(840));
+            p.add(new Long(550));
+            p.add(new Long(840));
+        } else {
+            String[] patternSplit = pattern.split(",");
+            for (String pp : patternSplit) {
+                pp = pp.trim();
+                if (pp.isEmpty() || !isNumeric(pp)) {
+                    continue;
+                }
 
-    public boolean vibrationEnabled() {
-        return (getPrefs().getBoolean("pref_vibrate", false) && canVibrate());
-    }
-
-    public void vibrateDevice() {
-        if (vibrationEnabled()) {
-            try {
-                Vibrator vi = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                long[] pattern = {225, 110, 225, 110, 225, 110};
-                vi.vibrate(pattern, -1);
-            } catch (Exception e) {
-                e.printStackTrace();
+                long ppv = Long.parseLong(pp);
+                if (ppv < 0L) {
+                    ppv = 0L;
+                } else if (ppv > 15000L) {
+                    ppv = 15000L;
+                }
+                p.add(ppv);
             }
+        }
+        p.add(0, new Long(0L));
+
+        try {
+            Vibrator vi = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            vi.vibrate(toPrimitive(p.toArray(new Long[p.size()])), -1);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -2274,11 +2387,10 @@ public class MeditationAssistant extends Application {
         AlertDialog accountsAlertDialog = new AlertDialog.Builder(activity)
                 .setTitle(R.string.permissionRequest)
                 .setMessage(R.string.permissionRequestNotificationControl)
-                .setPositiveButton(android.R.string.ok, 
-			new DialogInterface.OnClickListener() {
+			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 				@Override
-				public void onClick(DialogInterface dialog,
-									int id) {
+				public void onClick(DialogInterface dialogInterface,
+									int which) {
 					@SuppressLint("InlinedApi") Intent intent = new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
@@ -2289,7 +2401,7 @@ public class MeditationAssistant extends Application {
     }
 
     public ArrayList<Long> dateToSessionWindow(Calendar c) {
-        ArrayList<Long> sessionWindow = new ArrayList<Long>();
+        ArrayList<Long> sessionWindow = new ArrayList<>();
         ArrayList<Integer> streakbuffertime = getStreakBufferTime();
         Calendar sessionWindowCalendar = (Calendar) c.clone();
 
@@ -2352,7 +2464,7 @@ public class MeditationAssistant extends Application {
         }
 
         Intent e = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", getString(R.string.myEmailAddress), null));
-        String to[] = {getString(R.string.myEmailAddress)};
+        String[] to = {getString(R.string.myEmailAddress)};
         e.putExtra(Intent.EXTRA_EMAIL, to);
         e.putExtra(Intent.EXTRA_SUBJECT, "Meditation Assistant Debug Log");
         e.putExtra(Intent.EXTRA_TEXT, logcat.toString());
@@ -2379,15 +2491,23 @@ public class MeditationAssistant extends Application {
     }
 
     public String acquireWakeLock(boolean fullWakeUp) {
-        return wakeLocker.acquire(getApplicationContext(), fullWakeUp);
+        wakeLockerLock.lock();
+        String wakelockID = wakeLocker.acquire(getApplicationContext(), fullWakeUp);
+        wakeLockerLock.unlock();
+
+        return wakelockID;
     }
 
     public void releaseWakeLock(String wakeLockID) {
+        wakeLockerLock.lock();
         wakeLocker.release(wakeLockID);
+        wakeLockerLock.unlock();
     }
 
     public void releaseAllWakeLocks() {
+        wakeLockerLock.lock();
         wakeLocker.releaseAll();
+        wakeLockerLock.unlock();
     }
 
     public enum TrackerName {

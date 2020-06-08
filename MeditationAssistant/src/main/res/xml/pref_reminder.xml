@@ -19,7 +19,7 @@
         android:dependency="pref_daily_reminder"
         android:key="pref_vibrate_reminder"
         android:summary="@string/pref_vibrate_reminder_summary"
-        android:title="@string/pref_vibrate"/>
+        android:title="@string/vibrate"/>
 
     <EditTextPreference
         android:defaultValue=""
@@ -28,7 +28,7 @@
         android:summary=""
         android:title="@string/pref_daily_reminder_text"/>
 
-    <sh.ftp.rocketninelabs.meditationassistant.TimePreference
+    <net.gnu.meditationassistant.TimePreference
         android:defaultValue="19:00"
         android:dependency="pref_daily_reminder"
         android:key="pref_daily_reminder_time"

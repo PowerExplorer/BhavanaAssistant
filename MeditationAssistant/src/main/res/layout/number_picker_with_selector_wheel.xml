@@ -20,7 +20,7 @@
 
     <view
         android:id="@+id/np__numberpicker_input"
-        class="sh.ftp.rocketninelabs.meditationassistant.NumberPicker$CustomEditText"
+        class="net.gnu.meditationassistant.NumberPicker$CustomEditText"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@null"

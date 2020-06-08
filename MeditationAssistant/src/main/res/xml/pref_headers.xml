@@ -1,19 +1,19 @@
 <preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
 
     <header
-        android:fragment="sh.ftp.rocketninelabs.meditationassistant.SettingsActivity$SessionPreferenceFragment"
+        android:fragment="net.gnu.meditationassistant.SettingsActivity$SessionPreferenceFragment"
         android:title="@string/session"/>
 
     <header
-        android:fragment="sh.ftp.rocketninelabs.meditationassistant.SettingsActivity$MeditationPreferenceFragment"
+        android:fragment="net.gnu.meditationassistant.SettingsActivity$MeditationPreferenceFragment"
         android:title="@string/meditation"/>
     
     <header
-        android:fragment="sh.ftp.rocketninelabs.meditationassistant.SettingsActivity$ProgressPreferenceFragment"
+        android:fragment="net.gnu.meditationassistant.SettingsActivity$ProgressPreferenceFragment"
         android:title="@string/progress"/>
 
     <header
-        android:fragment="sh.ftp.rocketninelabs.meditationassistant.SettingsActivity$MediNETPreferenceFragment"
+        android:fragment="net.gnu.meditationassistant.SettingsActivity$MediNETPreferenceFragment"
         android:title="@string/mediNET"/>
 
 </preference-headers>

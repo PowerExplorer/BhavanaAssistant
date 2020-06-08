@@ -2,10 +2,11 @@ package net.gnu.meditationassistant;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.AnyThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
+
+//import androidx.annotation.AnyThread;
+//import androidx.annotation.NonNull;
+//import androidx.annotation.Nullable;
 
 import net.openid.appauth.AuthState;
 import net.openid.appauth.AuthorizationException;
@@ -18,6 +19,7 @@ import org.json.JSONException;
 import java.lang.ref.WeakReference;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
+import android.support.annotation.*;
 
 /**
  * An example persistence mechanism for an {@link AuthState} instance.

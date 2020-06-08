@@ -3,7 +3,7 @@
     <!-- These headers are only used pre-8.0 -->
 
     <header
-        android:fragment="sh.ftp.rocketninelabs.meditationassistant.SettingsActivity$ReminderPreferenceFragment"
+        android:fragment="net.gnu.meditationassistant.SettingsActivity$ReminderPreferenceFragment"
         android:title="@string/pref_daily_reminder"/>
 
 </preference-headers>

@@ -58,7 +58,7 @@ public class MediNETActivity extends Activity {
 
         return MeditationAssistant.URL_MEDINET + "/client_android.php?v="
                 + MediNET.version.toString() + "&avn="
-                + String.valueOf(getMeditationAssistant().getMAAppVersionNumber()) + "&th="
+                + getMeditationAssistant().getMAAppVersionNumber() + "&th="
                 + ma.getMAThemeString() + "&tz="
                 + TimeZone.getDefault().getID() + "&x="
                 + getMeditationAssistant().getMediNETKey() + "&page="
@@ -109,7 +109,7 @@ public class MediNETActivity extends Activity {
 
     @SuppressLint({"AddJavascriptInterface", "SetJavaScriptEnabled"})
     protected void initUI(boolean activityOnCreate) {
-        webViewPlaceholder = ((FrameLayout) findViewById(R.id.webViewPlaceholder));
+        webViewPlaceholder = (FrameLayout) findViewById(R.id.webViewPlaceholder);
 
         if (webView == null) {
             webView = new WebView(getApplicationContext());
@@ -281,8 +281,6 @@ public class MediNETActivity extends Activity {
         setContentView(R.layout.activity_medinet);
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        getMeditationAssistant().utility.initializeTracker(this);
-
         initUI(true);
     }
 
@@ -320,7 +318,7 @@ public class MediNETActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.d("MeditationAssistant",
-                "Selected menu item: " + String.valueOf(item.getItemId()));
+                "Selected menu item: " + item.getItemId());
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
             finish();
@@ -392,18 +390,6 @@ public class MediNETActivity extends Activity {
         super.onSaveInstanceState(outState);
 
         webView.saveState(outState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        getMeditationAssistant().utility.trackingStart(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        getMeditationAssistant().utility.trackingStop(this);
     }
 
     public void setWindowBackground() {

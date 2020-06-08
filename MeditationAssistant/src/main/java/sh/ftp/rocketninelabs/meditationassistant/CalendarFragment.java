@@ -3,7 +3,6 @@ package net.gnu.meditationassistant;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -19,8 +18,11 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
+//import androidx.fragment.app.Fragment;
+
 import java.util.Calendar;
 import java.util.Locale;
+import android.support.v4.app.*;
 
 public class CalendarFragment extends Fragment {
     GridView gridCalendar = null;

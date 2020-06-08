@@ -4,11 +4,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListView;
+import android.support.v4.app.*;
+
+//import androidx.fragment.app.ListFragment;
 
 public class SessionsFragment extends ListFragment {
     public MeditationAssistant ma = null;
@@ -58,13 +60,7 @@ public class SessionsFragment extends ListFragment {
 
                 selected_session = (SessionSQL) getListView().getItemAtPosition(position);
                 sessionDialog = new AlertDialog.Builder(getActivity())
-                        .setIcon(
-                                getActivity().getResources().getDrawable(
-                                        getMeditationAssistant().getTheme().obtainStyledAttributes(getMeditationAssistant().getMATheme(true),
-                                                new int[]{R.attr.actionIconGoToToday})
-                                                .getResourceId(0, 0)
-                                )
-                        )
+                        .setIcon(getActivity().getResources().getDrawable(getMeditationAssistant().getTheme().obtainStyledAttributes(getMeditationAssistant().getMATheme(true), new int[]{R.attr.actionIconGoToToday}).getResourceId(0, 0)))
                         .setTitle(session_title)
                         .setItems(R.array.session_actions,
                                 new DialogInterface.OnClickListener() {
@@ -93,15 +89,8 @@ public class SessionsFragment extends ListFragment {
                                                 getMeditationAssistant().getMediNET().postSession(0, null, null);
                                             }
                                         } else { // Delete
-                                            AlertDialog deleteDialog = new AlertDialog.Builder(
-                                                    getActivity())
-                                                    .setIcon(
-                                                            getActivity().getResources().getDrawable(
-                                                                    getMeditationAssistant().getTheme().obtainStyledAttributes(getMeditationAssistant().getMATheme(true),
-                                                                            new int[]{R.attr.actionIconGoToToday})
-                                                                            .getResourceId(0, 0)
-                                                            )
-                                                    )
+                                            AlertDialog deleteDialog = new AlertDialog.Builder(getActivity())
+                                                    .setIcon(getActivity().getResources().getDrawable(getMeditationAssistant().getTheme().obtainStyledAttributes(getMeditationAssistant().getMATheme(true), new int[]{R.attr.actionIconGoToToday}).getResourceId(0, 0)))
                                                     .setTitle(session_title)
                                                     .setItems(
                                                             R.array.session_delete_actions,
@@ -136,15 +125,16 @@ public class SessionsFragment extends ListFragment {
                                                                     }
                                                                 }
                                                             }
-                                                    ).create();
+                                                    )
+                                                    .create();
                                             deleteDialog.show();
                                         }
                                     }
                                 }
-                        ).create();
+                        )
+                        .create();
 
                 sessionDialog.show();
-
                 return true;
             }
         });

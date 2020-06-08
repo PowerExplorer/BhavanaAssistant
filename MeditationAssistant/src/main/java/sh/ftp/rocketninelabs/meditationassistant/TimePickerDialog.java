@@ -86,7 +86,7 @@ public class TimePickerDialog extends AlertDialog
                 (LayoutInflater) themeContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.time_picker_dialog, null);
         setView(view);
-        mTimePicker = (TimePicker) view.findViewById(R.id.timePicker);
+        mTimePicker = view.findViewById(R.id.timePicker);
 
         // initialize state
         mTimePicker.setIs24HourView(mIs24HourView);
@@ -111,8 +111,8 @@ public class TimePickerDialog extends AlertDialog
     private void tryNotifyTimeSet() {
         if (mCallback != null) {
             mTimePicker.clearFocus();
-            mCallback.onTimeSet(mTimePicker, mTimePicker.getCurrentHour().intValue(),
-                    mTimePicker.getCurrentMinute().intValue());
+            mCallback.onTimeSet(mTimePicker, mTimePicker.getCurrentHour(),
+                    mTimePicker.getCurrentMinute());
         }
     }
 
@@ -125,8 +125,8 @@ public class TimePickerDialog extends AlertDialog
     @Override
     public Bundle onSaveInstanceState() {
         Bundle state = super.onSaveInstanceState();
-        state.putInt(HOUR, mTimePicker.getCurrentHour().intValue());
-        state.putInt(MINUTE, mTimePicker.getCurrentMinute().intValue());
+        state.putInt(HOUR, mTimePicker.getCurrentHour());
+        state.putInt(MINUTE, mTimePicker.getCurrentMinute());
         state.putBoolean(IS_24_HOUR, mTimePicker.is24HourView());
         return state;
     }
