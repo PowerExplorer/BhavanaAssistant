@@ -280,7 +280,8 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
         Button btnPreset1 = (Button) findViewById(R.id.btnPreset1);
         Button btnPreset2 = (Button) findViewById(R.id.btnPreset2);
         Button btnPreset3 = (Button) findViewById(R.id.btnPreset3);
-
+		Button btnPreset4 = (Button) findViewById(R.id.btnPreset4);
+		
         View.OnLongClickListener presetListener = new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(final View view) {
@@ -321,6 +322,8 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
                     preset_key = "pref_preset_2";
                 } else if (view.getId() == R.id.btnPreset3) {
                     preset_key = "pref_preset_3";
+                } else if (view.getId() == R.id.btnPreset4) {
+                    preset_key = "pref_preset_4";
                 } else {
                     return false;
                 }
@@ -361,7 +364,8 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
         btnPreset1.setOnLongClickListener(presetListener);
         btnPreset2.setOnLongClickListener(presetListener);
         btnPreset3.setOnLongClickListener(presetListener);
-
+		btnPreset4.setOnLongClickListener(presetListener);
+		
         updateVisibleViews(false);
         if (getMeditationAssistant().getEditingDuration()) {
             changeDuration(null);
@@ -849,11 +853,13 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
         Button btnPreset1 = (Button) findViewById(R.id.btnPreset1);
         Button btnPreset2 = (Button) findViewById(R.id.btnPreset2);
         Button btnPreset3 = (Button) findViewById(R.id.btnPreset3);
-
+		Button btnPreset4 = (Button) findViewById(R.id.btnPreset4);
+		
         btnPreset1.setText(getMeditationAssistant().getPrefs().getString("pref_preset_1_label", getString(R.string.setPreset)));
         btnPreset2.setText(getMeditationAssistant().getPrefs().getString("pref_preset_2_label", getString(R.string.setPreset)));
         btnPreset3.setText(getMeditationAssistant().getPrefs().getString("pref_preset_3_label", getString(R.string.setPreset)));
-    }
+		btnPreset4.setText(getMeditationAssistant().getPrefs().getString("pref_preset_4_label", getString(R.string.setPreset)));
+	}
 
     public String getPresetDefaultLabel() {
         EditText editDuration = (EditText) findViewById(R.id.editDuration);
@@ -902,6 +908,8 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
             preset_key = "pref_preset_2";
         } else if (view.getId() == R.id.btnPreset3) {
             preset_key = "pref_preset_3";
+        } else if (view.getId() == R.id.btnPreset4) {
+            preset_key = "pref_preset_4";
         } else {
             return;
         }
