@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -12,8 +12,8 @@ public class TimePreference extends DialogPreference {
     private int lastHour = 0;
     private int lastMinute = 0;
     private TimePicker picker = null;
-    private Boolean is24hour = true;
-    private Integer maxhours = 24;
+    private boolean is24hour = true;
+    private int maxhours = 24;
     private Context ctx = null;
 
     public TimePreference(Context context, AttributeSet attrs) {
@@ -68,8 +68,8 @@ public class TimePreference extends DialogPreference {
         super.onDialogClosed(positiveResult);
 
         if (positiveResult) {
-            lastHour = picker.getCurrentHour();
-            lastMinute = picker.getCurrentMinute();
+            lastHour = picker.getCurrentHour().intValue();
+            lastMinute = picker.getCurrentMinute().intValue();
 
             String time = String.valueOf(lastHour) + ":" + String.valueOf(lastMinute);
 

@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -104,8 +104,8 @@ public class DailyReminderReceiver extends BroadcastReceiver {
         Integer reminderMinute = Integer.valueOf(reminderTimeSplit[1]);
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, reminderHour);
-        calendar.set(Calendar.MINUTE, reminderMinute);
+        calendar.set(Calendar.HOUR_OF_DAY, reminderHour.intValue());
+        calendar.set(Calendar.MINUTE, reminderMinute.intValue());
         calendar.set(Calendar.SECOND, 0);
 
         if (Calendar.getInstance().getTimeInMillis() > calendar.getTimeInMillis()) {

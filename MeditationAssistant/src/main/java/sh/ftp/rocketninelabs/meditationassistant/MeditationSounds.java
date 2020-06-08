@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 public class MeditationSounds {
     public static int getMeditationSound(String sound) {

@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.app.AlertDialog;
 import android.content.Context;

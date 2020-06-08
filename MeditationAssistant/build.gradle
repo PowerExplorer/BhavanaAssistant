@@ -11,7 +11,7 @@ android {
         versionCode 157
         versionName "1.5.7"
 
-        applicationId "sh.ftp.rocketninelabs.meditationassistant"
+        applicationId "net.gnu.meditationassistant"
         manifestPlaceholders = [
                 'appAuthRedirectScheme': applicationId
         ]
@@ -55,7 +55,7 @@ android {
             dimension "main"
             buildConfigField "String", "GOOGLEOAUTHKEY", "\"153054147563.apps.googleusercontent.com\""
 
-            applicationId "sh.ftp.rocketninelabs.meditationassistant.full"
+            applicationId "net.gnu.meditationassistant.full"
             manifestPlaceholders = [
                     'appAuthRedirectScheme': applicationId
             ]
@@ -66,7 +66,7 @@ android {
             buildConfigField "String", "GOOGLEOAUTHKEY", "\"821225341172-64l3l6kdk9ull9lc7fjgeuuu7nee7pb9.apps.googleusercontent.com\""
             delete('google-services.json')
 
-            applicationId "sh.ftp.rocketninelabs.meditationassistant.opensource"
+            applicationId "net.gnu.meditationassistant.opensource"
             manifestPlaceholders = [
                     'appAuthRedirectScheme': applicationId
             ]
@@ -74,33 +74,106 @@ android {
     }
 }
 
-dependencies {
-    implementation "com.android.support:support-compat:28.0.0"
-    implementation "com.android.support:support-core-utils:28.0.0"
-    implementation "com.android.support:support-core-ui:28.0.0"
-    implementation "com.android.support:support-media-compat:28.0.0"
-    implementation "com.android.support:support-fragment:28.0.0"
-    implementation "com.android.support:recyclerview-v7:28.0.0"
-    implementation "com.android.support:design:28.0.0"
-    implementation "net.openid:appauth:0.7.1"
-    implementation "com.squareup.okio:okio:2.2.2"
-    implementation 'com.opencsv:opencsv:4.6'
-    implementation "net.margaritov.preference.colorpicker.ColorPickerPreference:ColorPickerPreference:1.0.0"
 
-    freeImplementation 'com.google.android.gms:play-services-base:16.1.0'
-    fullImplementation 'com.google.android.gms:play-services-base:16.1.0'
-    freeImplementation 'com.google.android.gms:play-services-analytics:16.0.8'
-    fullImplementation 'com.google.android.gms:play-services-analytics:16.0.8'
-    //freeImplementation 'com.google.android.gms:play-services-wearable:15.0.1'
-    //fullImplementation 'com.google.android.gms:play-services-wearable:15.0.1'
-    freeImplementation 'com.google.android.gms:play-services-appinvite:16.1.1'
-    fullImplementation 'com.google.android.gms:play-services-appinvite:16.1.1'
-    freeImplementation 'com.google.android.gms:play-services-fitness:16.0.1'
-    fullImplementation 'com.google.android.gms:play-services-fitness:16.0.1'
+
+repositories {
+	jcenter()
+	mavenCentral()
+	google()
+    
+	maven {
+		url 'https://jitpack.io'
+		url 'http://search.maven.org/'
+		url 'https://mvnrepository.com'
+		url 'https://dl.google.com/dl/android/maven2/'
+		//url 'http://maven.ghostscript.com'
+		url "https://s3.amazonaws.com/repo.commonsware.com"
+		//url 'https://maven.google.com'
+		//https://dl-ssl.google.com/android/repository/repository-12.xml
+		//sources-25_r01.zip
+		//platform-25_r03.zip
+		//build-tools_r25.0.2-linux.zip
+		//build-tools_r25.0.2-windows.zip
+		//https://maven.google.com/com/android/support/support-annotations/27.1.1/support-annotations-27.1.1-sources.jar
+		//maven.google.com/group_path/library/version/library-version.ext
+		//maven.google.com/android/arch/lifecycle/compiler/1.0.0/compiler-1.0.0.pom .
+		
+		//url 'https://s3.amazonaws.com/repo.commonsware.com'
+		//url 'http://repo.commonsware.com' //
+		//url 'https://repo.boundlessgeo.com/main/'
+		//url 'http://objectbox.net/beta-repo/'
+		//url 'https://oss.jfrog.org/libs-snapshot'
+		//url 'https://github.com/psiegman/mvn-repo/raw/master/releases'
+		//url 'https://maven.java.net/content/repositories/releases/'
+		//url 'https://maven.fabric.io/public' 
+		//url 'https://dl.bintray.com/nuuneoi/maven/'
+		
+	}
+	
+	flatDir {
+        dirs 'libs'
+    }
+}
+
+//	git clone -b fanplayer https://github.com/rockcarry/ffmpeg
+//search method	\n\s*[^\s\*/\{\}\(\);]*\s*[^\s\{\}\(\);/]*\s*[^\s\{\}\(\);/]*\s*[^\s;/\{\}\(\)]+\s+[^\s\.;,/\(\)\{\}]+\s*\([^=!\|\(\)\{\};/]*\)\s*\{
+dependencies {
+    //implementation "com.android.support:support-compat:28.0.0"
+    //implementation "com.android.support:support-core-utils:28.0.0"
+    //implementation "com.android.support:support-core-ui:28.0.0"
+    //implementation "com.android.support:support-media-compat:28.0.0"
+    //implementation "com.android.support:support-fragment:28.0.0"
+    //implementation "com.android.support:recyclerview-v7:28.0.0"
+    //implementation "com.android.support:design:28.0.0"
+    //implementation "net.openid:appauth:0.7.1"
+    //implementation "com.squareup.okio:okio:2.2.2"
+    //implementation 'com.opencsv:opencsv:4.6'
+    //implementation "net.margaritov.preference.colorpicker.ColorPickerPreference:ColorPickerPreference:1.0.0"
+
+    //freeimplementation 'com.google.android.gms:play-services-base:16.1.0'
+    //fullimplementation 'com.google.android.gms:play-services-base:16.1.0'
+    //freeimplementation 'com.google.android.gms:play-services-analytics:16.0.8'
+    //fullimplementation 'com.google.android.gms:play-services-analytics:16.0.8'
+    ////freeimplementation 'com.google.android.gms:play-services-wearable:15.0.1'
+    ////fullimplementation 'com.google.android.gms:play-services-wearable:15.0.1'
+    //freeimplementation 'com.google.android.gms:play-services-appinvite:16.1.1'
+    //fullimplementation 'com.google.android.gms:play-services-appinvite:16.1.1'
+    //freeimplementation 'com.google.android.gms:play-services-fitness:16.0.1'
+    //fullimplementation 'com.google.android.gms:play-services-fitness:16.0.1'
     //noinspection GradleDynamicVersion
-    implementation 'ch.acra:acra-http:5.3.0'
-    implementation 'com.github.amlcurran.showcaseview:library:5.4.3'
-    implementation 'com.nononsenseapps:filepicker:4.2.1'
+    //implementation 'ch.acra:acra-http:5.3.0'
+    //implementation 'com.github.amlcurran.showcaseview:library:5.4.3'
+    //implementation 'com.nononsenseapps:filepicker:4.2.1'
+    //wearApp project(':MeditationAssistantWear')
+    // TODO: Uncomment when Wear app is ready
+    
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    
+    compile "com.android.support:support-compat:25.0.0"
+    compile "com.android.support:support-v4:25.0.0"
+    compile "com.android.support:appcompat-v7:25.0.0"
+    
+	//compile "com.android.support:support-annotations:25.0.0"
+	
+	//compile 'com.android.support:support-vector-drawable:25.0.0'
+	//compile 'com.android.support:animated-vector-drawable:25.0.0'
+	
+    compile "com.android.support:support-core-utils:25.0.0"
+    compile "com.android.support:support-core-ui:25.0.0"
+    compile "com.android.support:support-media-compat:25.0.0"
+    compile "com.android.support:support-fragment:25.0.0"
+    compile "com.android.support:recyclerview-v7:25.0.0"
+    compile "com.android.support:design:25.0.0"
+    
+    compile "net.openid:appauth:0.7.1"
+    //compile "com.squareup.okio:okio:2.2.2"
+    //compile 'com.opencsv:opencsv:4.6'
+    compile "net.margaritov.preference.colorpicker.ColorPickerPreference:ColorPickerPreference:1.0.0"
+
+    //compile 'ch.acra:acra-http:5.5.1' //5.3.0'
+    compile 'com.github.amlcurran.showcaseview:library:5.4.3'
+    compile 'com.nononsenseapps:filepicker:4.2.1'
+    
     //wearApp project(':MeditationAssistantWear')
     // TODO: Uncomment when Wear app is ready
 }

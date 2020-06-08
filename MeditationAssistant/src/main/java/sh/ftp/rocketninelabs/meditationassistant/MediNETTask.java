@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -26,7 +26,7 @@ public class MediNETTask extends AsyncTask<MediNET, Integer, MediNET> {
     public String nextURL = null;
     public String action = "";
     public String actionextra = "";
-    public Long actionextranumber = (long) 0;
+    public long actionextranumber = 0;
     public MediNET medinet;
     private MeditationAssistant ma = null;
     public Runnable onComplete;
@@ -47,8 +47,8 @@ public class MediNETTask extends AsyncTask<MediNET, Integer, MediNET> {
         Date now = new Date();
         int offsetFromUTC = tz.getOffset(now.getTime());
         String appVersion = getMeditationAssistant().getMAAppVersion();
-        if (BuildConfig.FLAVOR != "free") {
-            appVersion += BuildConfig.FLAVOR;
+        if (BuildConfigBackup.FLAVOR != "free") {
+            appVersion += BuildConfigBackup.FLAVOR;
         }
 
         if (this.nextURL == null) {
@@ -193,8 +193,8 @@ public class MediNETTask extends AsyncTask<MediNET, Integer, MediNET> {
                         String streakHeader = medinetConnection.getHeaderField("x-MediNET-Streak");
                         if (streakHeader.contains(",")) {
                             Integer streakDay = Integer.valueOf(streakHeader.split(",")[0]);
-                            if (streakDay > getMeditationAssistant().getMeditationStreak().get(0)) {
-                                getMeditationAssistant().setMeditationStreak(streakDay, Integer.valueOf(streakHeader.split(",")[1]));
+                            if (streakDay.intValue() > getMeditationAssistant().getMeditationStreak().get(0).longValue()) {
+                                getMeditationAssistant().setMeditationStreak(streakDay, Long.valueOf(streakHeader.split(",")[1]).longValue());
                                 getMeditationAssistant().recalculateMeditationStreak(medinet.activity);
                             }
                         }
@@ -203,8 +203,8 @@ public class MediNETTask extends AsyncTask<MediNET, Integer, MediNET> {
                 if (medinetConnection.getHeaderField("x-MediNET-MaxStreak") != null) {
                     if (!medinetConnection.getHeaderField("x-MediNET-MaxStreak").equals("")) {
                         Integer maxstreak = Integer.valueOf(medinetConnection.getHeaderField("x-MediNET-MaxStreak"));
-                        if (maxstreak > getMeditationAssistant().getLongestMeditationStreak()) {
-                            getMeditationAssistant().setLongestMeditationStreak(maxstreak);
+                        if (maxstreak.intValue() > getMeditationAssistant().getLongestMeditationStreak()) {
+                            getMeditationAssistant().setLongestMeditationStreak(maxstreak.intValue());
                         }
                     }
                 }
@@ -269,7 +269,7 @@ public class MediNETTask extends AsyncTask<MediNET, Integer, MediNET> {
 
                             getMeditationAssistant().shortToast(getMeditationAssistant().getString(R.string.sessionDeletedMediNET));
 
-                            SessionSQL deletedsession = getMeditationAssistant().db.getSessionByStarted(Long.valueOf(actionextra));
+                            SessionSQL deletedsession = getMeditationAssistant().db.getSessionByStarted(Long.valueOf(actionextra).longValue());
                             if (deletedsession != null) {
                                 deletedsession._isposted = (long) 0;
                                 deletedsession._modified = getMeditationAssistant().getTimestamp();
@@ -293,22 +293,22 @@ public class MediNETTask extends AsyncTask<MediNET, Integer, MediNET> {
                         } else if (medinet.result.equals("alreadyposted") && actionextra.equals("manualposting")) {
                             getMeditationAssistant().shortToast(getMeditationAssistant().getString(R.string.sessionAlreadyPosted));
                         } else {
-                            Integer sessionsuploaded = 0;
+                            int sessionsuploaded = 0;
                             if (jsonObj.has("sessionsuploaded")) {
                                 sessionsuploaded = jsonObj.getInt("sessionsuploaded");
                             }
 
                             if (sessions.size() > 0 && medinet.result.equals("uploaded") && sessionsuploaded > 0) {
                                 for (SessionSQL sessionsql : sessions) {
-                                    sessionsql._isposted = (long) 1;
+                                    sessionsql._isposted = 1L;
                                     sessionsql._modified = getMeditationAssistant().getTimestamp();
                                     getMeditationAssistant().db.addSession(sessionsql, (long) 0);
                                 }
 
-                                Integer sessuploaded = sessions.size();
+                                int sessuploaded = sessions.size();
                                 getMeditationAssistant().longToast(String.format(getMeditationAssistant().getResources().getQuantityString(
                                         R.plurals.sessionsUploaded, sessuploaded,
-                                        sessuploaded), String.valueOf(sessuploaded))
+                                        Integer.valueOf(sessuploaded)), String.valueOf(sessuploaded))
                                 );
                             } else {
                                 getMeditationAssistant().longToast(getMeditationAssistant().getString(R.string.sessionsUpToDate));
@@ -317,7 +317,7 @@ public class MediNETTask extends AsyncTask<MediNET, Integer, MediNET> {
                     } else if (action.equals("downloadsessions")) {
                         JSONArray jArray = jsonObj.getJSONArray("downloadsessions");
 
-                        Integer sessimported = 0;
+                        int sessimported = 0;
 
                         SessionSQL sess;
                         for (int i = 0; i < jArray.length(); i++) {
@@ -351,7 +351,7 @@ public class MediNETTask extends AsyncTask<MediNET, Integer, MediNET> {
                         if (sessimported > 0) {
                             getMeditationAssistant().longToast(String.format(getMeditationAssistant().getResources().getQuantityString(
                                     R.plurals.sessionsDownloaded, sessimported,
-                                    sessimported), String.valueOf(sessimported))
+                                    Integer.valueOf(sessimported)), String.valueOf(sessimported))
                             );
                         } else {
                             getMeditationAssistant().longToast(getMeditationAssistant().getString(R.string.sessionsUpToDate));

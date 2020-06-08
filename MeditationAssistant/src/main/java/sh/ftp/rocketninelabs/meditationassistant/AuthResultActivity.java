@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 
 import android.app.Activity;
@@ -135,7 +135,7 @@ public class AuthResultActivity extends Activity {
         }
 
         Long expiresAt = state.getAccessTokenExpirationTime();
-        if (expiresAt != null && expiresAt < System.currentTimeMillis()) {
+        if (expiresAt != null && expiresAt.longValue() < System.currentTimeMillis()) {
             refreshAccessToken();
             return;
         }
@@ -152,7 +152,11 @@ public class AuthResultActivity extends Activity {
         log("Refreshing access token");
         performTokenRequest(
                 mStateManager.getCurrent().createTokenRefreshRequest(),
-                this::handleAccessTokenResponse);
+			new AuthorizationService.TokenResponseCallback() {
+				@Override
+				public void onTokenRequestCompleted(TokenResponse p1, AuthorizationException p2) {
+					AuthResultActivity.this.handleAccessTokenResponse(p1, p2);
+					}});
     }
 
     @MainThread
@@ -160,7 +164,14 @@ public class AuthResultActivity extends Activity {
         log("Exchanging authorization code");
         performTokenRequest(
                 authorizationResponse.createTokenExchangeRequest(),
-                this::handleCodeExchangeResponse);
+			new AuthorizationService.TokenResponseCallback() {
+				@Override
+				public void onTokenRequestCompleted(TokenResponse p1, AuthorizationException p2) {
+					AuthResultActivity.this.handleCodeExchangeResponse(p1, p2);
+				}
+				
+				
+			});
     }
 
     @MainThread
@@ -187,7 +198,12 @@ public class AuthResultActivity extends Activity {
             @Nullable TokenResponse tokenResponse,
             @Nullable AuthorizationException authException) {
         mStateManager.updateAfterTokenResponse(tokenResponse, authException);
-        runOnUiThread(this::updateState);
+			runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						AuthResultActivity.this.updateState();
+					}
+				});
     }
 
     @WorkerThread
@@ -196,7 +212,12 @@ public class AuthResultActivity extends Activity {
             @Nullable AuthorizationException authException) {
 
         mStateManager.updateAfterTokenResponse(tokenResponse, authException);
-        runOnUiThread(this::updateState);
+			runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						AuthResultActivity.this.updateState();
+					}
+		});
     }
 
     public MeditationAssistant getMeditationAssistant() {

@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 /*
  * Copyright (C) 2007-2008 OpenIntents.org
  *

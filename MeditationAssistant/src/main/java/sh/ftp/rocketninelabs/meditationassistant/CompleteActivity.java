@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -71,7 +71,7 @@ public class CompleteActivity extends Activity {
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
         );
 
-        Boolean manual = false;
+        boolean manual = false;
         if (getIntent().hasExtra("manual")) {
             if (getIntent().getBooleanExtra("manual", false)) {
                 manual = true;

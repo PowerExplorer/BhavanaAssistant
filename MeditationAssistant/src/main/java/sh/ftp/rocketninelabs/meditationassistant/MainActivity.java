@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -53,38 +53,46 @@ import java.util.Locale;
 import java.util.Set;
 
 public class MainActivity extends Activity implements OnShowcaseEventListener {
-    public static String BROADCAST_ACTION_ALARM = "sh.ftp.rocketninelabs.meditationassistant.ALARM";
+    public static String BROADCAST_ACTION_ALARM = "net.gnu.meditationassistant.ALARM";
     public static int ID_DELAY = 77702;
     public static int ID_INTERVAL = 77701;
     public static int ID_END = 77703;
 
     public MeditationAssistant ma = null;
-    SharedPreferences.OnSharedPreferenceChangeListener sharedPrefslistener = (newprefs, key) -> {
-        Object newValue = getMeditationAssistant().getPrefs().getAll().get(key);
-        Log.d("MeditationAssistant", key + " changed to " + newValue);
+    SharedPreferences.OnSharedPreferenceChangeListener sharedPrefslistener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+		@Override
+		public void onSharedPreferenceChanged(final SharedPreferences newprefs, final String key) {
+			Object newValue = getMeditationAssistant().getPrefs().getAll().get(key);
+			Log.d("MeditationAssistant", key + " changed to " + newValue);
 
-        new Handler(Looper.getMainLooper()).post(() -> {
-            if ((key.equals("timerHours") || key.equals("timerMinutes")) && getMeditationAssistant().getTimeToStopMeditate() < 1) {
-                TextView txtTimer = (TextView) findViewById(R.id.txtTimer);
-                txtTimer.setText(getMeditationAssistant().getPrefs().getString("timerHours", "0")
-                        + ":"
-                        + String.format("%02d", Integer.valueOf(getMeditationAssistant().getPrefs().getString(
-                        "timerMinutes", "15"))));
-            } else if (key.equals("medinetupdate")
-                    || key.equals("pref_meditation_sound_finish")
-                    || key.equals("pref_meditation_sound_finish_custom")
-                    || key.equals("pref_meditation_sound_start")
-                    || key.equals("pref_meditation_sound_start_custom")
-                    || key.equals("meditationstreak")) {
-                updateTexts();
-            } else if (key.equals("pref_text_size")) {
-                updateTextSize();
-            } else if (key.equals("keyupdate")) {
-                if (!getMeditationAssistant().getMediNETKey().equals("")) {
-                    getMeditationAssistant().getMediNET().connect();
-                }
-            }
-        });
+			new Handler(Looper.getMainLooper()).post(new Runnable() {
+					@Override
+					public void run() {
+						if ((key.equals("timerHours") || key.equals("timerMinutes")) && getMeditationAssistant().getTimeToStopMeditate() < 1) {
+							TextView txtTimer = (TextView) findViewById(R.id.txtTimer);
+							txtTimer.setText(getMeditationAssistant().getPrefs().getString("timerHours", "0")
+											 + ":"
+											 + String.format("%02d", Integer.valueOf(getMeditationAssistant().getPrefs().getString(
+																						 "timerMinutes", "15"))));
+						} else if (key.equals("medinetupdate")
+								   || key.equals("pref_meditation_sound_finish")
+								   || key.equals("pref_meditation_sound_finish_custom")
+								   || key.equals("pref_meditation_sound_start")
+								   || key.equals("pref_meditation_sound_start_custom")
+								   || key.equals("meditationstreak")) {
+							updateTexts();
+						} else if (key.equals("pref_text_size")) {
+							updateTextSize();
+						} else if (key.equals("keyupdate")) {
+							if (!getMeditationAssistant().getMediNETKey().equals("")) {
+								getMeditationAssistant().getMediNET().connect();
+							}
+						}
+					}
+
+
+				});
+		}
     };
     private Handler handler;
     private Runnable meditateRunnable = null;
@@ -155,7 +163,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
     private boolean skipDelay;
     private boolean playedStartSound;
     private String previous_timermode = "timed";
-    private Boolean usetimepicker = true;
+    private boolean usetimepicker = true;
     private ShowcaseView sv = null;
     private String next_tutorial = "";
     private int intervals = 0;
@@ -193,8 +201,8 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
 
         Set<String> hideMainButtons = getMeditationAssistant().getPrefs().getStringSet("pref_mainbuttons", null);
         if (hideMainButtons != null) {
-            Boolean hidProgress = false;
-            Boolean hidCommunity = false;
+            boolean hidProgress = false;
+            boolean hidCommunity = false;
 
             for (Iterator<String> hidebtni = hideMainButtons.iterator(); hidebtni.hasNext(); ) {
                 String hideButton = hidebtni.next();
@@ -229,7 +237,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 
-        findViewById(R.id.btnMeditate).setLongClickable(true);
+        ((View)findViewById(R.id.btnMeditate)).setLongClickable(true);
         final View btnMeditate = findViewById(R.id.btnMeditate);
         btnMeditate.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -438,8 +446,8 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
         showNextTutorial();
         getMeditationAssistant().recalculateMeditationStreak(MainActivity.this);
 
-        long pref_delay = Integer.valueOf(getMeditationAssistant().getPrefs().getString("pref_delay", "-1"));
-        long pref_interval = Integer.valueOf(getMeditationAssistant().getPrefs().getString("pref_interval", "-1"));
+        long pref_delay = Long.valueOf(getMeditationAssistant().getPrefs().getString("pref_delay", "-1")).longValue();
+        long pref_interval = Long.valueOf(getMeditationAssistant().getPrefs().getString("pref_interval", "-1")).longValue();
         if (pref_delay >= 0 || pref_interval >= 0) {
             getMeditationAssistant().getPrefs().edit().putString("pref_delay", "-1").putString("pref_interval", "-1").apply();
 
@@ -613,7 +621,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
             }
         }
 
-        Boolean wasEditing = false;
+        boolean wasEditing = false;
         if (txtTimer.getVisibility() == View.GONE) {
             layEditDuration.setVisibility(View.GONE);
             txtTimer.setVisibility(View.VISIBLE);
@@ -902,7 +910,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
         }
 
         String preset_value = getMeditationAssistant().getPrefs().getString(preset_key, "");
-        Boolean successfulRestore = false;
+        boolean successfulRestore = false;
 
         if (!preset_value.equals("")) {
             try {
@@ -1225,12 +1233,12 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
         intervals = 0;
 
         Log.d("MeditationAssistant", "Timestamp: " + String.valueOf(timestamp));
-        Integer secondsTillFinished = 0;
+        long secondsTillFinished = 0;
         if (getMeditationAssistant().getTimerMode().equals("timed")) {
-            secondsTillFinished = Integer.parseInt(getMeditationAssistant().getPrefs().getString(
+            secondsTillFinished = Long.parseLong(getMeditationAssistant().getPrefs().getString(
                     "timerHours", "0"))
                     * 3600
-                    + (Integer.parseInt(getMeditationAssistant().getPrefs().getString("timerMinutes", "15")) * 60);
+				+ (Long.parseLong(getMeditationAssistant().getPrefs().getString("timerMinutes", "15")) * 60);
         } else if (getMeditationAssistant().getTimerMode().equals("endat")) {
             Date now = new Date();
 
@@ -1285,7 +1293,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
             Log.d("MeditationAssistant", "-- END AT: " + String.valueOf(c_endat.getTimeInMillis() / 1000) + " NOW: " + String.valueOf(c_now.getTimeInMillis() / 1000));
 
             // Add two seconds to account for partial seconds between now and the end at time for pretty durations
-            secondsTillFinished = (int) ((c_endat.getTimeInMillis() - c_now.getTimeInMillis()) / 1000) + 2;
+            secondsTillFinished = ((c_endat.getTimeInMillis() - c_now.getTimeInMillis()) / 1000) + 2;
 
             if (secondsTillFinished < 60) {
                 getMeditationAssistant().shortToast(getString(R.string.invalidEndAt));
@@ -1457,26 +1465,29 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
     }
 
     private void screenDimOrOff() {
-        String pref_screencontrol = getMeditationAssistant().getPrefs().getString("pref_screencontrol", "dim");
+        final String pref_screencontrol = getMeditationAssistant().getPrefs().getString("pref_screencontrol", "dim");
         if (!pref_screencontrol.equals("ondim") && !pref_screencontrol.equals("dim") && !pref_screencontrol.equals("off")) {
             return;
         }
 
-        screenDimRunnable = () -> {
-            if (getMeditationAssistant().getTimeStartMeditate() == 0) {
-                Log.d("MeditationAssistant", "Exiting runnable for dimming screen");
-                return;
-            }
+        screenDimRunnable = new Runnable() {
+			@Override
+			public void run() {
+				if (getMeditationAssistant().getTimeStartMeditate() == 0) {
+					Log.d("MeditationAssistant", "Exiting runnable for dimming screen");
+					return;
+				}
 
-            WindowManager.LayoutParams windowParams = getWindow().getAttributes();
-            windowParams.screenBrightness = 0.01f;
-            getWindow().setAttributes(windowParams);
+				WindowManager.LayoutParams windowParams = getWindow().getAttributes();
+				windowParams.screenBrightness = 0.01f;
+				getWindow().setAttributes(windowParams);
 
-            if (pref_screencontrol.equals("ondim")) {
-                getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            } else {
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            }
+				if (pref_screencontrol.equals("ondim")) {
+					getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+				} else {
+					getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+				}
+			}
         };
 
         handler.postDelayed(screenDimRunnable, 250);
@@ -1733,9 +1744,9 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
             }
         } else {
             btnMeditationStreak.setText(res.getQuantityString(
-                    R.plurals.daysOfMeditation, getMeditationAssistant()
-                            .getMeditationStreak().get(0).intValue(),
-                    getMeditationAssistant().getMeditationStreak().get(0).intValue()
+                    R.plurals.daysOfMeditation, (int)getMeditationAssistant()
+                            .getMeditationStreak().get(0).longValue(),
+                    getMeditationAssistant().getMeditationStreak().get(0)
             ));
         }
 
@@ -1809,9 +1820,9 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
             }
 
             if (intent.getBooleanExtra("wakeup", false)) {
-                Boolean fullWakeUp = intent.getBooleanExtra("fullwakeup", false);
-                Boolean wakeUpStart = intent.getBooleanExtra("wakeupstart", false);
-                Boolean wakeUpInterval = intent.getBooleanExtra("wakeupinterval", false);
+                boolean fullWakeUp = intent.getBooleanExtra("fullwakeup", false);
+                boolean wakeUpStart = intent.getBooleanExtra("wakeupstart", false);
+                boolean wakeUpInterval = intent.getBooleanExtra("wakeupinterval", false);
 
                 Log.d("MeditationAssistant", "ALARM RECEIVER INTEGRATED: Received broadcast - Full: " + (fullWakeUp ? "Full" : "Partial") + " - Start/interval: " + (wakeUpStart ? "Start" : (wakeUpInterval ? "Interval" : "Neither")));
 
@@ -1838,7 +1849,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
                         if (interval_limit.equals("")) {
                             interval_limit = "0";
                         }
-                        if (Integer.valueOf(interval_limit) > 0 && intervals >= Integer.valueOf(interval_limit)) {
+                        if (Integer.valueOf(interval_limit).intValue() > 0 && intervals >= Integer.valueOf(interval_limit).intValue()) {
                             Log.d("MeditationAssistant", "Interval - reached interval limit, not firing A");
                             return; // No further intervals
                         }
@@ -1870,7 +1881,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
                                     - (System.currentTimeMillis() / 1000)) > (interval + 30)) || getMeditationAssistant().getPrefs().getBoolean("pref_softfinish", false))) {
                                 intervals++;
 
-                                if (Integer.valueOf(interval_limit) > 0 && intervals >= Integer.valueOf(interval_limit)) {
+                                if (Integer.valueOf(interval_limit).intValue() > 0 && intervals >= Integer.valueOf(interval_limit).intValue()) {
                                     Log.d("MeditationAssistant", "Interval - reached interval limit, not firing B");
                                     return; // No further intervals
                                 }
@@ -1930,7 +1941,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
         TextView txtDurationSeconds = (TextView) findViewById(R.id.txtDurationSeconds);
 
         long duration = 0;
-        Long timestamp = System.currentTimeMillis() / 1000;
+        long timestamp = System.currentTimeMillis() / 1000;
 
         if (getMeditationAssistant().getTimeToStopMeditate() == -1
                 || getMeditationAssistant().getTimeToStopMeditate() > 0) {
@@ -1989,7 +2000,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
         if (getMeditationAssistant().getTimeToStopMeditate() == -1 || duration > 0 || (getMeditationAssistant().getTimeToStopMeditate() > 0 && getMeditationAssistant().getPrefs().getBoolean("pref_softfinish", false))) {
             long delayRemaining = getMeditationAssistant().getTimeStartMeditate() - timestamp;
 
-            findViewById(R.id.btnMeditate).setEnabled(true);
+            ((View)findViewById(R.id.btnMeditate)).setEnabled(true);
 
             if (getMeditationAssistant().ispaused) {
                 btnMeditate.setText(getString(R.string.resumeOrEnd));
@@ -2026,7 +2037,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
             }
         } else {
             txtDurationSeconds.setText("");
-            findViewById(R.id.btnMeditate).setEnabled(true);
+            ((View)findViewById(R.id.btnMeditate)).setEnabled(true);
             btnMeditate.setText(getString(R.string.meditate));
             getMeditationAssistant().setAlphaCompat(txtDurationSeconds, 1.0f);
 
@@ -2052,7 +2063,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
 
         if (setDisabled) {
             btnMeditate.setText(getString(R.string.meditate));
-            findViewById(R.id.btnMeditate).setEnabled(false);
+            ((View)findViewById(R.id.btnMeditate)).setEnabled(false);
         }
 
         updateTexts();

@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,9 +16,9 @@ public class Preset {
     public String completesound = "";
     public String completesoundcustom = "";
     public String ringtone = "";
-    public Integer volume = 50;
-    public Boolean endless = false;
-    public Boolean vibrate = false;
+    public int volume = 50;
+    public boolean endless = false;
+    public boolean vibrate = false;
 
     public JSONObject export() {
         JSONObject jobj = new JSONObject();

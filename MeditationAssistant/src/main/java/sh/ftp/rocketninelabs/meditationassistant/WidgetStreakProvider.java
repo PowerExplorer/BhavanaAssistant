@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;

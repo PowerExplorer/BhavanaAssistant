@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 /*
  * Copyright (C) 2007 The Android Open Source Project
@@ -25,7 +25,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import sh.ftp.rocketninelabs.meditationassistant.TimePicker.OnTimeChangedListener;
+import net.gnu.meditationassistant.TimePicker.OnTimeChangedListener;
 
 /**
  * A dialog that prompts the user for the time of day using a {@link TimePicker}.
@@ -111,8 +111,8 @@ public class TimePickerDialog extends AlertDialog
     private void tryNotifyTimeSet() {
         if (mCallback != null) {
             mTimePicker.clearFocus();
-            mCallback.onTimeSet(mTimePicker, mTimePicker.getCurrentHour(),
-                    mTimePicker.getCurrentMinute());
+            mCallback.onTimeSet(mTimePicker, mTimePicker.getCurrentHour().intValue(),
+                    mTimePicker.getCurrentMinute().intValue());
         }
     }
 
@@ -125,8 +125,8 @@ public class TimePickerDialog extends AlertDialog
     @Override
     public Bundle onSaveInstanceState() {
         Bundle state = super.onSaveInstanceState();
-        state.putInt(HOUR, mTimePicker.getCurrentHour());
-        state.putInt(MINUTE, mTimePicker.getCurrentMinute());
+        state.putInt(HOUR, mTimePicker.getCurrentHour().intValue());
+        state.putInt(MINUTE, mTimePicker.getCurrentMinute().intValue());
         state.putBoolean(IS_24_HOUR, mTimePicker.is24HourView());
         return state;
     }

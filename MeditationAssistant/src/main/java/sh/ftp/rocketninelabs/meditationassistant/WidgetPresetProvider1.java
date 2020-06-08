@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 public class WidgetPresetProvider1 extends WidgetPresetProvider {
 

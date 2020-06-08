@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -108,7 +108,7 @@ public class MediNETActivity extends Activity {
     }
 
     @SuppressLint({"AddJavascriptInterface", "SetJavaScriptEnabled"})
-    protected void initUI(Boolean activityOnCreate) {
+    protected void initUI(boolean activityOnCreate) {
         webViewPlaceholder = ((FrameLayout) findViewById(R.id.webViewPlaceholder));
 
         if (webView == null) {

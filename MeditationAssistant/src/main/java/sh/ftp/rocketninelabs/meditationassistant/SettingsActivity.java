@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -55,11 +55,11 @@ public class SettingsActivity extends PreferenceActivity {
     private static final int PERMISSION_REQUEST_SOUND_READ_EXTERNAL_STORAGE = 3002;
     private static final int PERMISSION_REQUEST_IMPORT_READ_EXTERNAL_STORAGE = 3003;
     private static final int PERMISSION_REQUEST_EXPORT_WRITE_EXTERNAL_STORAGE = 3004;
-    public Boolean initialTimePickerChange = true;
-    public Boolean initialMainButtonsChange = true;
-    public Boolean initialSoundChangeStart = true;
-    public Boolean initialSoundChangeInterval = true;
-    public Boolean initialSoundChangeFinish = true;
+    public boolean initialTimePickerChange = true;
+    public boolean initialMainButtonsChange = true;
+    public boolean initialSoundChangeStart = true;
+    public boolean initialSoundChangeInterval = true;
+    public boolean initialSoundChangeFinish = true;
     public SessionPreferenceFragment sessionPreferenceFragment = null;
     public ReminderPreferenceFragment reminderPreferenceFragment = null;
     public MeditationPreferenceFragment meditationPreferenceFragment = null;
@@ -216,14 +216,14 @@ public class SettingsActivity extends PreferenceActivity {
                 if (preference.getKey().equals("pref_daily_reminder_time") || preference.getKey().equals("pref_meditationstreakbuffer")) {
                     String timeValue = "";
                     try {
-                        String[] timeValueSplit = ((stringValue != null && stringValue != "") ? stringValue : (preference.getKey().equals("pref_daily_reminder_time") ? "19:00" : "4:00")).split(":");
+                        String[] timeValueSplit = ((stringValue != null && stringValue.trim().length() != 0) ? stringValue : (preference.getKey().equals("pref_daily_reminder_time") ? "19:00" : "4:00")).split(":");
 
                         String ampm = "AM";
-                        if (Integer.valueOf(timeValueSplit[0]) >= 12) {
-                            timeValueSplit[0] = String.valueOf(Integer.valueOf(timeValueSplit[0]) - 12);
+                        if (Integer.parseInt(timeValueSplit[0]) >= 12) {
+                            timeValueSplit[0] = String.valueOf(Integer.parseInt(timeValueSplit[0]) - 12);
                             ampm = "PM";
                         }
-                        if (Integer.valueOf(timeValueSplit[0]) == 0) {
+                        if (Integer.parseInt(timeValueSplit[0]) == 0) {
                             timeValueSplit[0] = "12";
                         }
 
@@ -243,13 +243,13 @@ public class SettingsActivity extends PreferenceActivity {
                     Log.d("MeditationAssistant", preference.getKey() + " value: " + String.valueOf(stringValue));
 
                     String timeValue = "";
-                    Boolean isDisabled = false;
+                    boolean isDisabled = false;
                     try {
-                        String[] timeValueSplit = ((stringValue != null && stringValue != "") ? stringValue : (preference.getKey().equals("pref_session_delay") ? "00:15" : "00:00")).split(":");
-                        timeValue = String.valueOf((int) Math.floor(Integer.valueOf(timeValueSplit[0]) / 60)) + ":"
-                                + String.format("%02d", Integer.valueOf(timeValueSplit[0]) % 60) + ":"
+                        String[] timeValueSplit = ((stringValue != null && stringValue.trim().length() != 0) ? stringValue : (preference.getKey().equals("pref_session_delay") ? "00:15" : "00:00")).split(":");
+                        timeValue = String.valueOf(Integer.parseInt(timeValueSplit[0]) / 60) + ":"
+							+ String.format("%02d", Integer.valueOf(Integer.parseInt(timeValueSplit[0]) % 60)) + ":"
                                 + String.format("%02d", Integer.valueOf(timeValueSplit[1]));
-                        isDisabled = (Integer.valueOf(timeValueSplit[0]) == 0 && Integer.valueOf(timeValueSplit[1]) == 0);
+                        isDisabled = (Integer.parseInt(timeValueSplit[0]) == 0 && Integer.parseInt(timeValueSplit[1]) == 0);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -274,16 +274,16 @@ public class SettingsActivity extends PreferenceActivity {
                 if (stringValue == null || stringValue.equals("")) {
                     stringValue = "50";
                 }
-                preference.setSummary(String.valueOf(((Integer.valueOf(stringValue) + 4) / 5 * 5)) + "%");
+                preference.setSummary(String.valueOf(((Integer.parseInt(stringValue) + 4) / 5 * 5)) + "%");
             } else if (preference.getKey().equals("pref_interval_count")) {
                 if (stringValue == null || String.valueOf(stringValue).trim().equals("")) {
                     stringValue = "0";
                 }
-                if (Integer.valueOf(stringValue) <= 0) {
+                if (Integer.parseInt(stringValue) <= 0) {
                     preference.setSummary(getString(R.string.unlimited));
                 } else {
                     preference.setSummary(getResources().getQuantityString(
-                            R.plurals.numtimes, Integer.valueOf(stringValue),
+                            R.plurals.numtimes, Integer.parseInt(stringValue),
                             String.valueOf(Integer.valueOf(stringValue))
                     ));
                 }
@@ -436,8 +436,8 @@ public class SettingsActivity extends PreferenceActivity {
         }
     }
 
-    private Long uploadsessions_lastlick = (long) 0;
-    private Long downloadsessions_lastlick = (long) 0;
+    private long uploadsessions_lastlick = 0;
+    private long downloadsessions_lastlick = 0;
 
     private static boolean isXLargeTablet(Context context) {
         return FORCE_TABLET_VIEW || ((context.getResources().getConfiguration().screenLayout
@@ -720,7 +720,7 @@ public class SettingsActivity extends PreferenceActivity {
             bindPreferenceSummaryToValue(preferenceFragment == null ? findPreference("pref_widgetcolor") : preferenceFragment.findPreference("pref_widgetcolor"));
             bindPreferenceSummaryToValue(preferenceFragment == null ? findPreference("pref_mainbuttons") : preferenceFragment.findPreference("pref_mainbuttons"));
 
-            if (BuildConfig.FLAVOR.equals("opensource")) { // Hide usage statistics preference, as tracking is completely disabled
+            if (BuildConfigBackup.FLAVOR.equals("opensource")) { // Hide usage statistics preference, as tracking is completely disabled
                 CheckBoxPreference pref_sendusage = (CheckBoxPreference) (preferenceFragment == null ? findPreference("pref_sendusage") : preferenceFragment.findPreference("pref_sendusage"));
                 (preferenceFragment == null ? getPreferenceScreen() : preferenceFragment.getPreferenceScreen()).removePreference(pref_sendusage);
             }

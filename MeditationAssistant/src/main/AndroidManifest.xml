@@ -1,19 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="sh.ftp.rocketninelabs.meditationassistant">
+    package="net.gnu.meditationassistant">
 
     <application
-        android:name="sh.ftp.rocketninelabs.meditationassistant.MeditationAssistant"
+        android:name="net.gnu.meditationassistant.MeditationAssistant"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/appNameShort"
         android:theme="@style/MeditationDarkTheme">
 
+        <activity
+            android:name="net.openid.appauth.AuthorizationManagementActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="net.openid.appauth.RedirectUriReceiverActivity"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="net.gnu.meditationassistant" />
+            </intent-filter>
+        </activity>
+        
         <!-- Services -->
         <activity
-            android:name="sh.ftp.rocketninelabs.meditationassistant.MainActivity"
+            android:name="net.gnu.meditationassistant.MainActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize|orientation"
             android:label="@string/appNameShort"
             android:launchMode="singleTask">
@@ -22,32 +40,32 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="sh.ftp.rocketninelabs.meditationassistant.ALARM"></action>
+                <action android:name="net.gnu.meditationassistant.ALARM"></action>
             </intent-filter>
         </activity>
 
         <!-- Receivers -->
         <activity
-            android:name="sh.ftp.rocketninelabs.meditationassistant.SettingsActivity"
+            android:name="net.gnu.meditationassistant.SettingsActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize|orientation"
             android:label="@string/settings"
             android:launchMode="singleTop"
-            android:parentActivityName="sh.ftp.rocketninelabs.meditationassistant.MainActivity"
+            android:parentActivityName="net.gnu.meditationassistant.MainActivity"
             tools:ignore="UnusedAttribute">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sh.ftp.rocketninelabs.meditationassistant.MainActivity" />
+                android:value="net.gnu.meditationassistant.MainActivity" />
         </activity>
 
         <!-- Providers -->
         <activity
-            android:name="sh.ftp.rocketninelabs.meditationassistant.AuthResultActivity"
+            android:name="net.gnu.meditationassistant.AuthResultActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize|orientation"
             android:label="@string/signInToMediNET"
             android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sh.ftp.rocketninelabs.meditationassistant.MainActivity" />
+                android:value="net.gnu.meditationassistant.MainActivity" />
         </activity>
 
         <!-- Widgets -->
@@ -64,42 +82,42 @@
                 android:resource="@xml/widget_streak_1" />
         </receiver>-->
         <activity
-            android:name="sh.ftp.rocketninelabs.meditationassistant.MediNETActivity"
+            android:name="net.gnu.meditationassistant.MediNETActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize|orientation"
             android:label=""
             android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sh.ftp.rocketninelabs.meditationassistant.MainActivity" />
+                android:value="net.gnu.meditationassistant.MainActivity" />
         </activity>
         <activity
-            android:name="sh.ftp.rocketninelabs.meditationassistant.CompleteActivity"
+            android:name="net.gnu.meditationassistant.CompleteActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize|orientation"
             android:label="@string/sessioncomplete">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sh.ftp.rocketninelabs.meditationassistant.MainActivity" />
+                android:value="net.gnu.meditationassistant.MainActivity" />
         </activity>
 
         <!-- Activities -->
         <activity
-            android:name="sh.ftp.rocketninelabs.meditationassistant.AboutActivity"
+            android:name="net.gnu.meditationassistant.AboutActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize|orientation"
             android:label="@string/about">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sh.ftp.rocketninelabs.meditationassistant.MainActivity" />
+                android:value="net.gnu.meditationassistant.MainActivity" />
         </activity>
         <activity
-            android:name="sh.ftp.rocketninelabs.meditationassistant.ProgressActivity"
+            android:name="net.gnu.meditationassistant.ProgressActivity"
             android:configChanges="keyboard|keyboardHidden|screenSize|orientation"
             android:label="@string/progress">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="sh.ftp.rocketninelabs.meditationassistant.MainActivity" />
+                android:value="net.gnu.meditationassistant.MainActivity" />
         </activity>
         <activity
-            android:name="sh.ftp.rocketninelabs.meditationassistant.PresetWidgetActivity"
+            android:name="net.gnu.meditationassistant.PresetWidgetActivity"
             android:excludeFromRecents="true"
             android:theme="@style/MeditationDarkDialogTheme">
             <intent-filter>
@@ -125,11 +143,11 @@
                 android:resource="@xml/nnf_provider_paths" />
         </provider>
         <receiver
-            android:name="sh.ftp.rocketninelabs.meditationassistant.DailyReminderReceiver"
+            android:name="net.gnu.meditationassistant.DailyReminderReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="sh.ftp.rocketninelabs.meditationassistant.DAILY_NOTIFICATION"></action>
-                <action android:name="sh.ftp.rocketninelabs.meditationassistant.DAILY_NOTIFICATION_UPDATED"></action>
+                <action android:name="net.gnu.meditationassistant.DAILY_NOTIFICATION"></action>
+                <action android:name="net.gnu.meditationassistant.DAILY_NOTIFICATION_UPDATED"></action>
                 <action android:name="android.intent.action.EXTERNAL_APPLICATIONS_AVAILABLE" />
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
             </intent-filter>
@@ -198,8 +216,8 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_streak_3" />
         </receiver>
-        <service android:name="sh.ftp.rocketninelabs.meditationassistant.WidgetPresetService"></service>
-        <service android:name="sh.ftp.rocketninelabs.meditationassistant.WidgetStreakService"></service>
+        <service android:name="net.gnu.meditationassistant.WidgetPresetService"></service>
+        <service android:name="net.gnu.meditationassistant.WidgetStreakService"></service>
     </application>
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"

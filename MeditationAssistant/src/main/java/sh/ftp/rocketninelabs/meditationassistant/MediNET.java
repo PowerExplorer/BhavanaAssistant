@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class MediNET {
-    public static Integer version = 6;
+    public static Integer version = Integer.valueOf(6);
     // API v1-5 was used on pre Android 4.1 (discontinued) releases
     // API v6 signifies non-discontinued (1.4.1+, Android 4.1+) app version
 
@@ -30,17 +30,17 @@ public class MediNET {
     public String provider = "";
     public ArrayList<MeditationSession> result_sessions = null;
     public String announcement = "";
-    private Boolean debug = false;
+    private boolean debug = false;
     private MeditationAssistant ma = null;
     private MediNETTask task = null;
     private Handler handler = new Handler();
     private Runnable runnable;
     private Runnable runnable2;
-    private Boolean runnable_finished = true;
+    private boolean runnable_finished = true;
     private AlertDialog alertDialog = null;
     private String browsetopage = "";
 
-    public MediNET(MainActivity _activity) {
+    public MediNET(final MainActivity _activity) {
         activity = _activity;
         runnable = new Runnable() {
             @Override
@@ -106,7 +106,7 @@ public class MediNET {
         ConnectivityManager cm = (ConnectivityManager) getMeditationAssistant()
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        Boolean internetconnected = (netInfo != null && netInfo.isConnectedOrConnecting());
+        boolean internetconnected = (netInfo != null && netInfo.isConnectedOrConnecting());
 
         if (!internetconnected) {
             Log.d("MeditationAssistant",
@@ -150,7 +150,7 @@ public class MediNET {
         return false;
     }
 
-    public Boolean deleteSessionByStarted(long started) {
+    public boolean deleteSessionByStarted(long started) {
         if (task != null) {
             task.cancel(true);
         }
@@ -203,7 +203,7 @@ public class MediNET {
         this.status = status;
     }
 
-    public Boolean postSession(long updateSessionStarted, Activity activity, Runnable onComplete) {
+    public boolean postSession(long updateSessionStarted, Activity activity, Runnable onComplete) {
         Log.d("MeditationAssistant", "Session.toString(): " + this.getSession().export().toString());
         if (task != null) {
             task.cancel(true);
@@ -226,12 +226,12 @@ public class MediNET {
         return true;
     }
 
-    public boolean saveSession(long updateSessionStarted, Boolean manualposting, Boolean posted) {
-        Boolean saved;
+    public boolean saveSession(long updateSessionStarted, boolean manualposting, boolean posted) {
+        boolean saved;
 
-        Long postedlong = (long) 0;
+        Long postedlong = Long.valueOf(0);
         if (posted) {
-            postedlong = (long) 1;
+            postedlong = Long.valueOf(1);
         }
 
         // Only add streak if there isn't already a session for that day
@@ -302,7 +302,7 @@ public class MediNET {
         updated();
     }
 
-    public Boolean downloadSessions() {
+    public boolean downloadSessions() {
         getMeditationAssistant().shortToast(getMeditationAssistant().getString(R.string.downloadingSessions));
         if (task != null) {
             task.cancel(true);
@@ -316,7 +316,7 @@ public class MediNET {
         return true;
     }
 
-    public Boolean uploadSessions() {
+    public boolean uploadSessions() {
         getMeditationAssistant().shortToast(getMeditationAssistant().getString(R.string.uploadingSessions));
         if (task != null) {
             task.cancel(true);

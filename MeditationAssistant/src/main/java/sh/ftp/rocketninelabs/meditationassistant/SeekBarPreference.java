@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -107,7 +107,7 @@ public class SeekBarPreference extends DialogPreference implements SeekBar.OnSee
         if (restore)
             mValue = shouldPersist() ? getPersistedInt(mDefault) : 0;
         else
-            mValue = (Integer) defaultValue;
+            mValue = ((Integer)defaultValue).intValue();
     }
     // ------------------------------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
@@ -35,7 +35,7 @@ public class PresetWidgetActivity extends Activity {
         setContentView(R.layout.widget_preset_configure);
         setTitle(R.string.configureWidget);
 
-        MeditationAssistant ma = (MeditationAssistant) getApplicationContext();
+        final MeditationAssistant ma = (MeditationAssistant) getApplicationContext();
 
         getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         mAppWidgetText = (EditText) findViewById(R.id.presetWidgetLabel);

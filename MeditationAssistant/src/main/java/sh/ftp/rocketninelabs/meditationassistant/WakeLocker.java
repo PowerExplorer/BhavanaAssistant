@@ -1,4 +1,4 @@
-package sh.ftp.rocketninelabs.meditationassistant;
+package net.gnu.meditationassistant;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,7 +15,7 @@ class WakeLocker {
     private PowerManager.WakeLock wakeLockScreenOn;
 
     @SuppressLint({"WakelockTimeout"})
-    String acquire(Context ctx, Boolean turnScreenOn) {
+    String acquire(Context ctx, boolean turnScreenOn) {
         String wakeLockID = String.valueOf(System.currentTimeMillis());
 
         Log.d("MeditationAssistant", "WAKELOCKER: Acquiring wakelock " + wakeLockID);
