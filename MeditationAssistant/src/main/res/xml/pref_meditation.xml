@@ -1,0 +1,54 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_display_seconds"
+        android:summary="@string/pref_display_seconds_summary"
+        android:title="@string/pref_display_seconds"/>
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_notification"
+        android:summary="@string/pref_notification_summary"
+        android:title="@string/pref_notification"/>
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_usetimepicker"
+        android:summary="@string/pref_usetimepicker_summary"
+        android:title="@string/pref_usetimepicker"/>
+
+    <ListPreference
+        android:defaultValue="dim"
+        android:dialogIcon="?attr/actionIconBrightnessLow"
+        android:entries="@array/screencontrol"
+        android:entryValues="@array/screencontrol_values"
+        android:key="pref_screencontrol"
+        android:title="@string/pref_screencontrol"/>
+
+    <ListPreference
+        android:defaultValue=""
+        android:dialogIcon="?attr/actionIconFullScreen"
+        android:entries="@array/full_screen"
+        android:entryValues="@array/full_screen_values"
+        android:key="pref_full_screen"
+        android:title="@string/pref_full_screen"/>
+
+    <ListPreference
+        android:defaultValue="normal"
+        android:entries="@array/text_sizes"
+        android:entryValues="@array/text_sizes_values"
+        android:key="pref_text_size"
+        android:summary=""
+        android:title="@string/pref_text_size"/>
+
+    <ListPreference
+        android:defaultValue=""
+        android:entries="@array/autosave_labels"
+        android:entryValues="@array/autosave_values"
+        android:key="pref_autosave"
+        android:summary=""
+        android:title="@string/pref_autosave"/>
+
+</PreferenceScreen>
