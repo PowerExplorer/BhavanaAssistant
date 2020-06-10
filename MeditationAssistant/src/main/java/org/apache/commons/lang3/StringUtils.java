@@ -166,6 +166,19 @@ public class StringUtils {
         return !isBlank(cs);
     }
 
+	public static boolean isNumeric(final CharSequence cs) {
+		if (cs == null || cs.length() == 0) {
+			return false;
+		}
+		final int sz = cs.length();
+		for (int i = 0; i < sz; i++) {
+			if (!Character.isDigit(cs.charAt(i))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
     /**
      * Gets a CharSequence length or {@code 0} if the CharSequence is
      * {@code null}.

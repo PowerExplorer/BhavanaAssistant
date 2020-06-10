@@ -330,7 +330,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
 
                 LayoutInflater presetInflater = getLayoutInflater();
                 View presetLayout = presetInflater.inflate(R.layout.set_preset, null);
-                final EditText editPresetTitle = presetLayout. findViewById(R.id.editPresetTitle);
+                final EditText editPresetTitle = (EditText) presetLayout. findViewById(R.id.editPresetTitle);
                 editPresetTitle.setText(getPresetDefaultLabel());
                 editPresetTitle.setSelection(editPresetTitle.getText().length());
                 editPresetTitle.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);

@@ -89,6 +89,7 @@ import java.util.regex.Pattern;
 import android.support.annotation.*;
 import android.support.v4.app.*;
 import android.view.*;
+import org.apache.commons.lang3.*;
 //import org.apache.commons.lang3.StringUtils;
 //import org.apache.commons.lang3.ArrayUtils;
 
@@ -1150,7 +1151,7 @@ public class MeditationAssistant extends Application {
         if (applaunches == 1) {
             getPrefs().edit().putBoolean("askedtodonate156", true).apply();
         } else if (!getPrefs().getBoolean("askedtodonate156", false)) {
-            asktodonate = true;
+            //asktodonate = true;
             getPrefs().edit().putBoolean("askedtodonate156", true).apply();
         }
         getPrefs().edit().putInt("applaunches", applaunches).apply();
@@ -2251,7 +2252,7 @@ public class MeditationAssistant extends Application {
                 R.layout.sessions_exported,
                 (ViewGroup) activity.findViewById(R.id.sessionsExported_root));
 
-        TextView txtSessionsExportedPath = exp.findViewById(R.id.txtSessionsExportedPath);
+        TextView txtSessionsExportedPath = (TextView) exp.findViewById(R.id.txtSessionsExportedPath);
         txtSessionsExportedPath.setText(file.getPath());
 
         AlertDialog sessionsExportedDialog = new AlertDialog.Builder(activity)
@@ -2291,32 +2292,6 @@ public class MeditationAssistant extends Application {
         getApplicationContext().sendBroadcast(updateIntent);
     }
 	
-	public static long[] toPrimitive(final Long[] array) {
-		if (array == null) {
-			return null;
-		} else if (array.length == 0) {
-			return new long[0];
-		}
-		final long[] result = new long[array.length];
-		for (int i = 0; i < array.length; i++) {
-			result[i] = array[i].longValue();
-		}
-		return result;
-	}
-	
-	public static boolean isNumeric(final CharSequence cs) {
-		if (cs == null || cs.length() == 0) {
-			return false;
-		}
-		final int sz = cs.length();
-		for (int i = 0; i < sz; i++) {
-			if (!Character.isDigit(cs.charAt(i))) {
-				return false;
-			}
-		}
-		return true;
-	}
-	
     public void vibrateDevice(String pattern) {
         ArrayList<Long> p = new ArrayList<Long>();
         if (pattern.equals("short")) {
@@ -2335,7 +2310,7 @@ public class MeditationAssistant extends Application {
             String[] patternSplit = pattern.split(",");
             for (String pp : patternSplit) {
                 pp = pp.trim();
-                if (pp.isEmpty() || !isNumeric(pp)) {
+                if (pp.isEmpty() || !StringUtils.isNumeric(pp)) {
                     continue;
                 }
 
@@ -2352,7 +2327,7 @@ public class MeditationAssistant extends Application {
 
         try {
             Vibrator vi = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            vi.vibrate(toPrimitive(p.toArray(new Long[p.size()])), -1);
+            vi.vibrate(ArrayUtils.toPrimitive(p.toArray(new Long[p.size()])), -1);
         } catch (Exception e) {
             e.printStackTrace();
         }

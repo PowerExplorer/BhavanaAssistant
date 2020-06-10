@@ -184,8 +184,8 @@ public class ProgressActivity extends FragmentActivity {
                 R.layout.session_details,
 			((ViewGroup) findViewById(R.id.sessionDetails_root)));
 
-        TextView txtSessionDetailsStarted = detailsView.findViewById(R.id.txtSessionDetailsStarted);
-        TextView txtSessionDetailsMessage = detailsView.findViewById(R.id.txtSessionDetailsMessage);
+        TextView txtSessionDetailsStarted = (TextView) detailsView.findViewById(R.id.txtSessionDetailsStarted);
+        TextView txtSessionDetailsMessage = (TextView) detailsView.findViewById(R.id.txtSessionDetailsMessage);
 
         txtSessionDetailsStarted.setText(String.format(getString(R.string.sessionStartedAt), session_started));
 

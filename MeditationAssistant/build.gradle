@@ -122,7 +122,35 @@ repositories {
 //	git clone -b fanplayer https://github.com/rockcarry/ffmpeg
 //search method	\n\s*[^\s\*/\{\}\(\);]*\s*[^\s\{\}\(\);/]*\s*[^\s\{\}\(\);/]*\s*[^\s;/\{\}\(\)]+\s+[^\s\.;,/\(\)\{\}]+\s*\([^=!\|\(\)\{\};/]*\)\s*\{
 dependencies {
-    //implementation "com.android.support:support-compat:28.0.0"
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    
+    compile "com.android.support:support-compat:25.0.0"
+    compile "com.android.support:support-v4:25.0.0"
+    compile "com.android.support:appcompat-v7:25.0.0"
+    
+	//compile "com.android.support:support-annotations:25.0.0"
+	
+	compile 'com.android.support:support-vector-drawable:25.0.0'
+	//compile 'com.android.support:animated-vector-drawable:25.0.0'
+	
+    compile "com.android.support:support-core-utils:25.0.0"
+    compile "com.android.support:support-core-ui:25.0.0"
+    compile "com.android.support:support-media-compat:25.0.0"
+    compile "com.android.support:support-fragment:25.0.0"
+    compile "com.android.support:recyclerview-v7:25.0.0"
+    compile "com.android.support:design:25.0.0"
+    compile "com.android.support:customtabs:25.0.0"
+    
+    compile "net.openid:appauth:0.7.1"
+    //compile "com.squareup.okio:okio:2.2.2"
+    //compile 'com.opencsv:opencsv:4.6'
+    compile "net.margaritov.preference.colorpicker.ColorPickerPreference:ColorPickerPreference:1.0.0"
+
+    //compile 'ch.acra:acra-http:5.5.1' //5.3.0'
+    compile 'com.github.amlcurran.showcaseview:library:5.4.3'
+    compile 'com.nononsenseapps:filepicker:4.2.1'
+	
+	    //implementation "com.android.support:support-compat:28.0.0"
     //implementation "com.android.support:support-core-utils:28.0.0"
     //implementation "com.android.support:support-core-ui:28.0.0"
     //implementation "com.android.support:support-media-compat:28.0.0"
@@ -151,31 +179,6 @@ dependencies {
     //wearApp project(':MeditationAssistantWear')
     // TODO: Uncomment when Wear app is ready
     
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    
-    compile "com.android.support:support-compat:25.0.0"
-    compile "com.android.support:support-v4:25.0.0"
-    compile "com.android.support:appcompat-v7:25.0.0"
-    
-	//compile "com.android.support:support-annotations:25.0.0"
-	
-	compile 'com.android.support:support-vector-drawable:25.0.0'
-	//compile 'com.android.support:animated-vector-drawable:25.0.0'
-	
-    compile "com.android.support:support-core-utils:25.0.0"
-    compile "com.android.support:support-core-ui:25.0.0"
-    compile "com.android.support:support-media-compat:25.0.0"
-    compile "com.android.support:support-fragment:25.0.0"
-    compile "com.android.support:recyclerview-v7:25.0.0"
-    compile "com.android.support:design:25.0.0"
-    compile "com.android.support:customtabs:25.0.0"
-    
-    compile "net.openid:appauth:0.7.1"
-    //compile "com.squareup.okio:okio:2.2.2"
-    //compile 'com.opencsv:opencsv:4.6'
-    compile "net.margaritov.preference.colorpicker.ColorPickerPreference:ColorPickerPreference:1.0.0"
 
-    //compile 'ch.acra:acra-http:5.5.1' //5.3.0'
-    compile 'com.github.amlcurran.showcaseview:library:5.4.3'
-    compile 'com.nononsenseapps:filepicker:4.2.1'
+
 }

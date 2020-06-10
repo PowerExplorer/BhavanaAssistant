@@ -48,18 +48,18 @@ public class StatsFragment extends Fragment {
         int abovehours = abovedays % 3600;
         int time_spent_meditating_minutes = abovehours / 60;
 
-        TextView txtTimespentMeditatingDays = fragment_progress_stats.findViewById(R.id.txtTimeSpentMeditatingDays);
-        TextView txtTimespentMeditatingHours = fragment_progress_stats.findViewById(R.id.txtTimeSpentMeditatingHours);
-        TextView txtTimespentMeditatingMinutes = fragment_progress_stats.findViewById(R.id.txtTimeSpentMeditatingMinutes);
+        TextView txtTimespentMeditatingDays = (TextView) fragment_progress_stats.findViewById(R.id.txtTimeSpentMeditatingDays);
+        TextView txtTimespentMeditatingHours = (TextView) fragment_progress_stats.findViewById(R.id.txtTimeSpentMeditatingHours);
+        TextView txtTimespentMeditatingMinutes = (TextView) fragment_progress_stats.findViewById(R.id.txtTimeSpentMeditatingMinutes);
 
         txtTimespentMeditatingDays.setText(String.valueOf(time_spent_meditating_days));
         txtTimespentMeditatingHours.setText(String.valueOf(time_spent_meditating_hours));
         txtTimespentMeditatingMinutes.setText(String.valueOf(time_spent_meditating_minutes));
 
-        TextView txtOtherStatisticsSessions = fragment_progress_stats.findViewById(R.id.txtOtherStatisticsSessions);
-        TextView txtOtherStatisticsLongestDuration = fragment_progress_stats.findViewById(R.id.txtOtherStatisticsLongestDuration);
-        TextView txtOtherStatisticsAverageDuration = fragment_progress_stats.findViewById(R.id.txtOtherStatisticsAverageDuration);
-        TextView txtOtherStatisticsLongestStreak = fragment_progress_stats.findViewById(R.id.txtOtherStatisticsLongestStreak);
+        TextView txtOtherStatisticsSessions = (TextView) fragment_progress_stats.findViewById(R.id.txtOtherStatisticsSessions);
+        TextView txtOtherStatisticsLongestDuration = (TextView) fragment_progress_stats.findViewById(R.id.txtOtherStatisticsLongestDuration);
+        TextView txtOtherStatisticsAverageDuration = (TextView) fragment_progress_stats.findViewById(R.id.txtOtherStatisticsAverageDuration);
+        TextView txtOtherStatisticsLongestStreak = (TextView) fragment_progress_stats.findViewById(R.id.txtOtherStatisticsLongestStreak);
 
         int numSessions = getMeditationAssistant().db.getNumSessions();
         txtOtherStatisticsSessions.setText(NumberFormat.getNumberInstance(currentLocale).format(numSessions));

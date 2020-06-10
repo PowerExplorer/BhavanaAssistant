@@ -365,7 +365,7 @@ public class SettingsActivity extends PreferenceActivity {
 
         LayoutInflater presetInflater = getLayoutInflater();
         View presetLayout = presetInflater.inflate(R.layout.set_vibration, null);
-        final EditText editVibrationPattern = presetLayout.findViewById(R.id.editVibrationPattern);
+        final EditText editVibrationPattern = (EditText) presetLayout.findViewById(R.id.editVibrationPattern);
         editVibrationPattern.setText(value);
         editVibrationPattern.selectAll();
         editVibrationPattern.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);

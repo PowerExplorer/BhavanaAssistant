@@ -35,11 +35,11 @@ public class SessionAdapter extends ArrayAdapter<SessionSQL> {
 
         View rowView = inflater.inflate(R.layout.activity_sessions_item,
                 parent, false);
-        TextView txtSessionLength = rowView
+        TextView txtSessionLength = (TextView) rowView
                 .findViewById(R.id.session_length);
-        TextView txtSessionStarted = rowView
+        TextView txtSessionStarted = (TextView) rowView
                 .findViewById(R.id.session_started);
-        TextView txtSessionStartedTime = rowView
+        TextView txtSessionStartedTime = (TextView) rowView
                 .findViewById(R.id.session_started_time);
 
         txtSessionLength
