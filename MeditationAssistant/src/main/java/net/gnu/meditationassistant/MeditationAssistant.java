@@ -731,7 +731,7 @@ public class MeditationAssistant extends Application {
 
     public ArrayList<Integer> getStreakBufferTime() {
         if (streaktime.isEmpty()) {
-            String[] bufferSplit = getPrefs().getString("pref_meditationstreakbuffer", "4:00").split(":");
+            String[] bufferSplit = getPrefs().getString("pref_meditationstreakbuffer", "1:00").split(":");
             streaktime.add(Integer.valueOf(bufferSplit[0]));
             streaktime.add(Integer.valueOf(bufferSplit[1]));
         }

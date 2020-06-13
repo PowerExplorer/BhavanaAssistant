@@ -1,6 +1,5 @@
 # Meditation Assistant
 [![Translate](https://hosted.weblate.org/widgets/meditation-assistant/-/svg-badge.svg)](https://medinet.rocketnine.space/translate/)
-[![Donate](https://img.shields.io/liberapay/receives/rocketnine.space.svg?logo=liberapay)](https://liberapay.com/rocketnine.space)
 
 <a href="https://f-droid.org/packages/sh.ftp.rocketninelabs.meditationassistant.opensource/"><img width="121" height="36" alt="F-Droid" border="0" src="https://rocketnine.space/static/badge_fdroid_36.png"></a>
  &nbsp; <a href="https://play.google.com/store/apps/details?id=sh.ftp.rocketninelabs.meditationassistant"><img width="121" height="36" alt="Google Play" border="0" src="https://rocketnine.space/static/badge_google_36.png"></a>
@@ -26,11 +25,6 @@ will be meditating once a day, even if it's five or ten minutes out of your sche
 - Play an interval sound at a duration of your choice
 - Pause your session and come back to it when you are ready
 - Upload sessions to [MediNET](https://gitlab.com/tslocum/medinet)
-
-## Donate
-
-- [LiberaPay](https://liberapay.com/rocketnine.space) (preferred)
-- [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=TEP9HT98XK7QA)
 
 ## Get Support
 

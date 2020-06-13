@@ -126,7 +126,7 @@ public class CompleteActivity extends Activity {
                     .durationToTimerString(getMeditationAssistant()
                             .getMediNET().session.length, false));
 
-            String text_size = getMeditationAssistant().getPrefs().getString("pref_text_size", "normal");
+            String text_size = getMeditationAssistant().getPrefs().getString("pref_text_size", "tiny");
             if (text_size.equals("tiny")) {
                 txtDuration.setTextSize(85);
             } else if (text_size.equals("small")) {
@@ -149,7 +149,7 @@ public class CompleteActivity extends Activity {
         }
 
         if (!manual) {
-            String autosave = getMeditationAssistant().getPrefs().getString("pref_autosave", "");
+            String autosave = getMeditationAssistant().getPrefs().getString("pref_autosave", "save");
             if (autosave.equals("save")) {
                 saveMediNET(null);
             } else if (autosave.equals("post")) {

@@ -14,13 +14,13 @@
         android:title="@string/pref_notification"/>
 
     <CheckBoxPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="pref_usetimepicker"
         android:summary="@string/pref_usetimepicker_summary"
         android:title="@string/pref_usetimepicker"/>
 
     <ListPreference
-        android:defaultValue=""
+        android:defaultValue="save"
         android:entries="@array/autosave_labels"
         android:entryValues="@array/autosave_values"
         android:key="pref_autosave"
@@ -28,7 +28,7 @@
         android:title="@string/pref_autosave"/>
 
     <ListPreference
-        android:defaultValue=""
+        android:defaultValue="center"
         android:entries="@array/timer_positions"
         android:entryValues="@array/timer_positions_values"
         android:key="pref_timer_position"
@@ -36,7 +36,7 @@
         android:title="@string/timerPosition"/>
 
     <ListPreference
-        android:defaultValue="normal"
+        android:defaultValue="tiny"
         android:entries="@array/text_sizes"
         android:entryValues="@array/text_sizes_values"
         android:key="pref_text_size"

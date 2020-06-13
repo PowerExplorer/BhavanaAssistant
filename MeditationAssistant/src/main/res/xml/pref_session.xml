@@ -14,7 +14,7 @@
         android:title="@string/pref_sessionintro"/>
 
     <net.gnu.meditationassistant.TimePreference
-        android:defaultValue="00:15"
+        android:defaultValue="00:30"
         android:dialogIcon="?attr/actionIconTime"
         android:icon="?attr/actionIconTime"
         android:key="pref_session_delay"
@@ -24,7 +24,7 @@
         app:maxHours="90"/>
 
     <net.gnu.meditationassistant.ListPreferenceSound
-        android:defaultValue="gong"
+        android:defaultValue="gong_heavy"
         android:dialogIcon="?attr/actionIconVolumeOn"
         android:entries="@array/meditation_sounds"
         android:entryValues="@array/meditation_sounds_values"
@@ -42,7 +42,7 @@
         android:title="@string/pref_meditation_vibrate_start"/>
 
     <net.gnu.meditationassistant.TimePreference
-        android:defaultValue="00:00"
+        android:defaultValue="60:00"
         android:dialogIcon="?attr/actionIconTime"
         android:icon="?attr/actionIconTime"
         android:key="pref_session_interval"
@@ -108,7 +108,7 @@
     <net.gnu.meditationassistant.SeekBarPreference
         android:dialogIcon="?attr/actionIconVolumeOn"
         android:icon="?attr/actionIconVolumeOn"
-        android:defaultValue="50"
+        android:defaultValue="70"
         android:key="pref_sessionvolume"
         android:summary=""
         android:title="@string/pref_sessionvolume"/>

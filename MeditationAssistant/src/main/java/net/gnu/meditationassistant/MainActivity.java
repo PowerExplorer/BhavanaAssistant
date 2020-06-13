@@ -117,7 +117,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
                 getMeditationAssistant().notifySession(1, false, false);
 
                 long interval = Math.max(
-                        getMeditationAssistant().timePreferenceValueToSeconds(getMeditationAssistant().getPrefs().getString("pref_session_interval", "00:00"), "00:00"), 0);
+                        getMeditationAssistant().timePreferenceValueToSeconds(getMeditationAssistant().getPrefs().getString("pref_session_interval", "60:00"), "00:00"), 0);
                 Log.d("MeditationAssistant", "Interval is set to " + interval + " seconds");
 
                 if (interval > 0 && (getMeditationAssistant().getTimeToStopMeditate() == -1
@@ -230,7 +230,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
             }
         });
 
-        usetimepicker = getMeditationAssistant().getPrefs().getBoolean("pref_usetimepicker", false);
+        usetimepicker = getMeditationAssistant().getPrefs().getBoolean("pref_usetimepicker", true);
 
         final EditText editDuration = (EditText) findViewById(R.id.editDuration);
         final TimePicker timepickerDuration = (TimePicker) findViewById(R.id.timepickerDuration);
@@ -830,7 +830,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
     public void updateTextSize() {
         TextView txtTimer = (TextView) findViewById(R.id.txtTimer);
         EditText editDuration = (EditText) findViewById(R.id.editDuration);
-        String text_size = getMeditationAssistant().getPrefs().getString("pref_text_size", "normal");
+        String text_size = getMeditationAssistant().getPrefs().getString("pref_text_size", "tiny");
         if (text_size.equals("tiny")) {
             txtTimer.setTextSize(85);
             editDuration.setTextSize(85);
@@ -1108,12 +1108,12 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
         }
 
         preset.introduction = getMeditationAssistant().getPrefs().getString("pref_sessionintro", getString(R.string.ignore_introphrase));
-        preset.delay = getMeditationAssistant().getPrefs().getString("pref_session_delay", "00:15");
+        preset.delay = getMeditationAssistant().getPrefs().getString("pref_session_delay", "00:30");
         preset.startsound = getMeditationAssistant().getPrefs().getString("pref_meditation_sound_start", "");
         preset.startsoundcustom = getMeditationAssistant().getPrefs().getString("pref_meditation_sound_start_custom", "");
         preset.startvibration = getMeditationAssistant().getPrefs().getString("pref_meditation_vibrate_start", "");
         preset.startvibrationcustom = getMeditationAssistant().getPrefs().getString("pref_meditation_vibrate_start_custom", "");
-        preset.intervalduration = getMeditationAssistant().getPrefs().getString("pref_session_interval", "00:00");
+        preset.intervalduration = getMeditationAssistant().getPrefs().getString("pref_session_interval", "60:00");
         preset.intervalsound = getMeditationAssistant().getPrefs().getString("pref_meditation_sound_interval", "");
         preset.intervalsoundcustom = getMeditationAssistant().getPrefs().getString("pref_meditation_sound_interval_custom", "");
         preset.intervalvibration = getMeditationAssistant().getPrefs().getString("pref_meditation_vibrate_interval", "");
@@ -1338,7 +1338,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
         Log.d("MeditationAssistant", "Current delay value: " + getMeditationAssistant().getPrefs().getString("pref_session_delay", "00:15"));
 
         long delay = Math.max(
-                getMeditationAssistant().timePreferenceValueToSeconds(getMeditationAssistant().getPrefs().getString("pref_session_delay", "00:15"), "00:15"), 0);
+                getMeditationAssistant().timePreferenceValueToSeconds(getMeditationAssistant().getPrefs().getString("pref_session_delay", "00:30"), "00:15"), 0);
 
         getMeditationAssistant().setTimeStartMeditate(timestamp + delay);
 
@@ -1459,7 +1459,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
 
     private void setIntervalAlarm() {
         long interval = Math.max(
-                getMeditationAssistant().timePreferenceValueToSeconds(getMeditationAssistant().getPrefs().getString("pref_session_interval", "00:00"), "00:00"), 0);
+                getMeditationAssistant().timePreferenceValueToSeconds(getMeditationAssistant().getPrefs().getString("pref_session_interval", "60:00"), "00:00"), 0);
         Log.d("MeditationAssistant", "Interval is set to " + interval + " seconds");
 
         if (interval > 0) {
@@ -1646,7 +1646,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
             Log.d("MeditationAssistant", "onResume detected key change");
         }
 
-        usetimepicker = getMeditationAssistant().getPrefs().getBoolean("pref_usetimepicker", false);
+        usetimepicker = getMeditationAssistant().getPrefs().getBoolean("pref_usetimepicker", true);
 
         TextView txtDurationSeconds = (TextView) findViewById(R.id.txtDurationSeconds);
         if (getMeditationAssistant().getPrefs().getBoolean("pref_display_seconds", true)) {
@@ -1656,7 +1656,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
         }
 
         LinearLayout layTimer = (LinearLayout) findViewById(R.id.layTimer);
-        if (getMeditationAssistant().getPrefs().getString("pref_timer_position", "").equals("center")) {
+        if (getMeditationAssistant().getPrefs().getString("pref_timer_position", "Center").equals("center")) {
             layTimer.setGravity(Gravity.CENTER_VERTICAL);
         } else {
             layTimer.setGravity(Gravity.TOP);
@@ -1870,7 +1870,7 @@ public class MainActivity extends Activity implements OnShowcaseEventListener {
                         }
 
                         long interval = Math.max(
-                                getMeditationAssistant().timePreferenceValueToSeconds(getMeditationAssistant().getPrefs().getString("pref_session_interval", "00:00"), "00:00"), 0);
+                                getMeditationAssistant().timePreferenceValueToSeconds(getMeditationAssistant().getPrefs().getString("pref_session_interval", "60:00"), "00:00"), 0);
                         Log.d("MeditationAssistant", "Interval is set to " + interval + " seconds");
 
                         if (interval > 0 && (getMeditationAssistant().getTimeToStopMeditate() == -1

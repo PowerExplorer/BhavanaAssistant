@@ -80,7 +80,7 @@ public class ProgressActivity extends FragmentActivity {
         }
 
         String defaulttab = getMeditationAssistant().getPrefs().getString(
-                "pref_progresstab", "calendar");
+			"pref_progresstab", "stats");
         if (defaulttab.equals("sessions")) {
             mViewPager.setCurrentItem(SESSIONS_FRAGMENT, false);
         } else if (defaulttab.equals("stats")) {

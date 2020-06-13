@@ -195,7 +195,7 @@ public class SeekBarPreference extends DialogPreference implements SeekBar.OnSee
 
         AssetFileDescriptor afd = mContext
                 .getResources()
-                .openRawResourceFd(MeditationSounds.getMeditationSound("gong"));
+			.openRawResourceFd(MeditationSounds.getMeditationSound("gong_heavy"));
         try {
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(

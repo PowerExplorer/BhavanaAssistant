@@ -8,13 +8,13 @@
         android:title="@string/pref_showstreak"/>
 
     <net.gnu.meditationassistant.TimePreference
-        android:defaultValue="4:00"
+        android:defaultValue="1:00"
         android:key="pref_meditationstreakbuffer"
         android:title="@string/pref_meditationstreakbuffer"
         app:is24hour="false"/>
 
     <ListPreference
-        android:defaultValue="calendar"
+        android:defaultValue="stats"
         android:entries="@array/progresstabs"
         android:entryValues="@array/progresstabs_values"
         android:key="pref_progresstab"

@@ -165,7 +165,7 @@ public class SettingsActivity extends PreferenceActivity {
                 preference.setSummary(
                         index >= 0
                                 ? listPreference.getEntries()[index]
-                                : (preference instanceof ListPreferenceSound ? "Gong" : (preference.getKey().equals("pref_timer_position") ? getString(R.string.top) : getString(R.string.disabled)))
+					: (preference instanceof ListPreferenceSound ? "Heavy gong" : (preference.getKey().equals("pref_timer_position") ? getString(R.string.center) : getString(R.string.disabled)))
                 ); // TODO: Don't hardcode sound names
 
                 if (listPreference.getKey().equals("pref_theme")) {
@@ -271,7 +271,7 @@ public class SettingsActivity extends PreferenceActivity {
                     String timeValue = "";
                     boolean isDisabled = false;
                     try {
-                        String[] timeValueSplit = ((stringValue != null && stringValue.trim().length() != 0) ? stringValue : (preference.getKey().equals("pref_session_delay") ? "00:15" : "00:00")).split(":");
+                        String[] timeValueSplit = ((stringValue != null && stringValue.trim().length() != 0) ? stringValue : (preference.getKey().equals("pref_session_delay") ? "00:30" : "00:00")).split(":");
                         timeValue = (Integer.parseInt(timeValueSplit[0]) / 60) + ":"
 							+ String.format("%02d", Integer.valueOf(Integer.parseInt(timeValueSplit[0]) % 60)) + ":"
                                 + String.format("%02d", Integer.valueOf(timeValueSplit[1]));
@@ -575,7 +575,7 @@ public class SettingsActivity extends PreferenceActivity {
         }
 
         ListPreferenceSound prefMeditationSound = (ListPreferenceSound) (sessionPreferenceFragment == null ? findPreference(pref_key) : sessionPreferenceFragment.findPreference(pref_key));
-        prefMeditationSound.getOnPreferenceChangeListener().onPreferenceChange(prefMeditationSound, getMeditationAssistant().getPrefs().getString(pref_key, "gong"));
+        prefMeditationSound.getOnPreferenceChangeListener().onPreferenceChange(prefMeditationSound, getMeditationAssistant().getPrefs().getString(pref_key, "gong_heavy"));
     }
 
     @Override
@@ -893,9 +893,9 @@ public class SettingsActivity extends PreferenceActivity {
         } else if (preference.getKey().equals("pref_presetsettings")) {
             sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, getMeditationAssistant().getPrefs().getStringSet("pref_presetsettings", new HashSet<>(Arrays.asList(getResources().getStringArray(R.array.presetsettings_default)))));
         } else if (preference.getKey().equals("pref_mainbuttons")) {
-            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, getMeditationAssistant().getPrefs().getStringSet("pref_mainbuttons", new HashSet<>()));
+            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, getMeditationAssistant().getPrefs().getStringSet("pref_mainbuttons", new HashSet<>(Arrays.asList(new String[]{"medinet", "community"}))));
         } else if (preference.getKey().equals("pref_sessionvolume")) {
-            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, getMeditationAssistant().getPrefs().getInt("pref_sessionvolume", 50));
+            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, getMeditationAssistant().getPrefs().getInt("pref_sessionvolume", 70));
         } else {
             sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, getMeditationAssistant().getPrefs().getString(preference.getKey(), ""));
         }
